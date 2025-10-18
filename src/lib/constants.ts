@@ -1,0 +1,7 @@
+export const MAINNET_ADMIN_CAP = '0x0';
+export const MAINNET_PKG_ID = '0x0';
+
+export const TESTNET_ADMIN_CAP = '0xaf6d0b081d541da252af81e9856a16bbb081be667b7107e55a95f46af608f00b';
+export const TESTNET_PKG_ID = '0xb4729784ca8edf3283331624350fba28d9874fab02716b607f19b7df2d5e3c3c';
+
+export const UPGRADE_CAP = '0xb291955579982e05b0b6e8406dac129fff949509afd4385b95aa4055fff86cf5';
