@@ -7,8 +7,8 @@ const config: SuiCodegenConfig = {
     prune: true,
     packages: [
         {
-            package: '@local-pkg/lets-own',
-            path: '/Users/user/Desktop/SUI-MOVE/lets-own/smart-contract/collectivo',
+            package: '@local-pkg/collectivo',
+            path: '/Users/user/Desktop/SUI-MOVE/collectivo/smart-contract/collectivo',
         },
     ],
 };

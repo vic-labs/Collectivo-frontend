@@ -17,11 +17,11 @@ function App() {
 				<div className='flex items-center gap-1 '>
 					<img src='/logo.svg' alt='Logo' width={40} height={40} />
 					<h2 className='lg:text-2xl text-xl font-extrabold font-sans text-primary'>
-						Let's Own
+						Collectivo
 					</h2>
 				</div>
 				<p className='text-gray-600 dark:text-gray-300 text-base'>
-					© {new Date().getFullYear()} Let's Own. All rights reserved.
+					© {new Date().getFullYear()} Collectivo. All rights reserved.
 				</p>
 			</footer>
 		</>

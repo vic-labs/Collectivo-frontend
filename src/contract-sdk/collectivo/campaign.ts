@@ -7,7 +7,7 @@ import { type Transaction } from '@mysten/sui/transactions';
 import * as object from './deps/sui/object.js';
 import * as balance from './deps/sui/balance.js';
 import * as table from './deps/sui/table.js';
-const $moduleName = '@local-pkg/lets-own::campaign';
+const $moduleName = '@local-pkg/collectivo::campaign';
 export const ContributorInfo = new MoveStruct({ name: `${$moduleName}::ContributorInfo`, fields: {
         contributed_at: bcs.u64(),
         amount: bcs.u64()
@@ -108,7 +108,7 @@ export interface CreateOptions {
     ];
 }
 export function create(options: CreateOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         '0x0000000000000000000000000000000000000000000000000000000000000002::object::ID',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
@@ -139,7 +139,7 @@ export interface DeleteOptions {
     ];
 }
 export function _delete(options: DeleteOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -163,7 +163,7 @@ export interface ContributeOptions {
     ];
 }
 export function contribute(options: ContributeOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         '0x0000000000000000000000000000000000000000000000000000000000000002::coin::Coin<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
@@ -189,7 +189,7 @@ export interface WithdrawOptions {
     ];
 }
 export function withdraw(options: WithdrawOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         'u64'
@@ -226,7 +226,7 @@ export interface SetNftStatusOptions {
     ];
 }
 export function setNftStatus(options: SetNftStatusOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         `${packageAddress}::campaign::NFTStatus`,
@@ -259,7 +259,7 @@ export interface SetNftStatusErrorOptions {
     ];
 }
 export function setNftStatusError(options: SetNftStatusErrorOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         `${packageAddress}::campaign::NFTActionError`,
@@ -287,7 +287,7 @@ export interface CreateWalletOptions {
     ];
 }
 export function createWallet(options: CreateWalletOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         'address',
@@ -311,7 +311,7 @@ export interface GetWalletOptions {
     ];
 }
 export function getWallet(options: GetWalletOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -335,7 +335,7 @@ export interface GetUserContributionOptions {
     ];
 }
 export function getUserContribution(options: GetUserContributionOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         'address'
@@ -358,7 +358,7 @@ export interface ContributorAmountOptions {
     ];
 }
 export function contributorAmount(options: ContributorAmountOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::ContributorInfo`
     ] satisfies string[];
@@ -380,7 +380,7 @@ export interface SuiRaisedOptions {
     ];
 }
 export function suiRaised(options: SuiRaisedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -402,7 +402,7 @@ export interface TargetOptions {
     ];
 }
 export function target(options: TargetOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -424,7 +424,7 @@ export interface ContributorsCountOptions {
     ];
 }
 export function contributorsCount(options: ContributorsCountOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -448,7 +448,7 @@ export interface IsContributorOptions {
     ];
 }
 export function isContributor(options: IsContributorOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         'address'
@@ -471,7 +471,7 @@ export interface IsCompletedOptions {
     ];
 }
 export function isCompleted(options: IsCompletedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -493,7 +493,7 @@ export interface NftIsPurchasedOptions {
     ];
 }
 export function nftIsPurchased(options: NftIsPurchasedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -515,7 +515,7 @@ export interface NftIsListedOptions {
     ];
 }
 export function nftIsListed(options: NftIsListedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -537,7 +537,7 @@ export interface NftIsDelistedOptions {
     ];
 }
 export function nftIsDelisted(options: NftIsDelistedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];
@@ -559,7 +559,7 @@ export interface IdOptions {
     ];
 }
 export function id(options: IdOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`
     ] satisfies string[];

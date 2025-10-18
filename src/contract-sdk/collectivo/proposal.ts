@@ -6,7 +6,7 @@ import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
 import * as vec_set from './deps/sui/vec_set.js';
 import * as object from './deps/sui/object.js';
-const $moduleName = '@local-pkg/lets-own::proposal';
+const $moduleName = '@local-pkg/collectivo::proposal';
 export const VotersInfo = new MoveStruct({ name: `${$moduleName}::VotersInfo`, fields: {
         weight: bcs.u64(),
         voters: vec_set.VecSet(bcs.Address)
@@ -66,7 +66,7 @@ export interface CreateOptions {
     ];
 }
 export function create(options: CreateOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
         `${packageAddress}::proposal::ProposalType`,
@@ -90,7 +90,7 @@ export interface DeleteOptions {
     ];
 }
 export function _delete(options: DeleteOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -116,7 +116,7 @@ export interface VoteOptions {
     ];
 }
 export function vote(options: VoteOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`,
         `${packageAddress}::campaign::Campaign`,
@@ -141,7 +141,7 @@ export interface IsProposalPassedOptions {
     ];
 }
 export function isProposalPassed(options: IsProposalPassedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -163,7 +163,7 @@ export interface IsProposalActiveOptions {
     ];
 }
 export function isProposalActive(options: IsProposalActiveOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -185,7 +185,7 @@ export interface IsProposalRejectedOptions {
     ];
 }
 export function isProposalRejected(options: IsProposalRejectedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -207,7 +207,7 @@ export interface ProposerOptions {
     ];
 }
 export function proposer(options: ProposerOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -229,7 +229,7 @@ export interface CampaignIdOptions {
     ];
 }
 export function campaignId(options: CampaignIdOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -251,7 +251,7 @@ export interface ApprovalsWeightOptions {
     ];
 }
 export function approvalsWeight(options: ApprovalsWeightOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -273,7 +273,7 @@ export interface RejectionsWeightOptions {
     ];
 }
 export function rejectionsWeight(options: RejectionsWeightOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -297,7 +297,7 @@ export interface HasVoterVotedOptions {
     ];
 }
 export function hasVoterVoted(options: HasVoterVotedOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`,
         'address'
@@ -320,7 +320,7 @@ export interface StatusOptions {
     ];
 }
 export function status(options: StatusOptions) {
-    const packageAddress = options.package ?? '@local-pkg/lets-own';
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::proposal::Proposal`
     ] satisfies string[];
@@ -329,6 +329,28 @@ export function status(options: StatusOptions) {
         package: packageAddress,
         module: 'proposal',
         function: 'status',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
+export interface ProposalTypeArguments {
+    self: RawTransactionArgument<string>;
+}
+export interface ProposalTypeOptions {
+    package?: string;
+    arguments: ProposalTypeArguments | [
+        self: RawTransactionArgument<string>
+    ];
+}
+export function proposalType(options: ProposalTypeOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        `${packageAddress}::proposal::Proposal`
+    ] satisfies string[];
+    const parameterNames = ["self"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'proposal',
+        function: 'proposal_type',
         arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
     });
 }
