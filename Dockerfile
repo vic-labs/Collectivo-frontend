@@ -2,8 +2,19 @@ FROM oven/bun:latest
 
 WORKDIR /app
 
-COPY . .
+# Copy workspace configuration from monorepo root
+COPY package.json bun.lockb ./
 
+# Copy shared types package
+COPY packages/shared-types ./packages/shared-types/
+
+# Copy frontend application
+COPY frontend ./frontend/
+
+# Set working directory to frontend
+WORKDIR /app/frontend
+
+# Install dependencies (includes workspace packages)
 RUN bun install
 
 # Build the app for production
