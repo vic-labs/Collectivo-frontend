@@ -8,24 +8,32 @@ import * as object from './deps/sui/object.js';
 import * as balance from './deps/sui/balance.js';
 import * as table from './deps/sui/table.js';
 const $moduleName = '@local-pkg/collectivo::campaign';
-export const ContributorInfo = new MoveStruct({ name: `${$moduleName}::ContributorInfo`, fields: {
+export const ContributorInfo = new MoveStruct({
+    name: `${$moduleName}::ContributorInfo`, fields: {
         contributed_at: bcs.u64(),
         amount: bcs.u64()
-    } });
-export const NFT = new MoveStruct({ name: `${$moduleName}::NFT`, fields: {
+    }
+});
+export const NFT = new MoveStruct({
+    name: `${$moduleName}::NFT`, fields: {
         nft_id: bcs.Address,
         url: bcs.string(),
         image_url: bcs.string(),
         rank: bcs.u64(),
         is_purchased: bcs.bool(),
         is_listed: bcs.bool(),
+        nft_type: bcs.string(),
         name: bcs.string()
-    } });
-export const CampaignStatus = new MoveEnum({ name: `${$moduleName}::CampaignStatus`, fields: {
+    }
+});
+export const CampaignStatus = new MoveEnum({
+    name: `${$moduleName}::CampaignStatus`, fields: {
         Active: null,
         Completed: null
-    } });
-export const Campaign = new MoveStruct({ name: `${$moduleName}::Campaign`, fields: {
+    }
+});
+export const Campaign = new MoveStruct({
+    name: `${$moduleName}::Campaign`, fields: {
         id: object.UID,
         nft: NFT,
         description: bcs.string(),
@@ -37,57 +45,87 @@ export const Campaign = new MoveStruct({ name: `${$moduleName}::Campaign`, field
         status: CampaignStatus,
         creator: bcs.Address,
         created_at: bcs.u64()
-    } });
-export const NewCampaignEvent = new MoveStruct({ name: `${$moduleName}::NewCampaignEvent`, fields: {
+    }
+});
+export const NewCampaignEvent = new MoveStruct({
+    name: `${$moduleName}::NewCampaignEvent`, fields: {
         campaign_id: bcs.Address
-    } });
-export const CampaignDeletedEvent = new MoveStruct({ name: `${$moduleName}::CampaignDeletedEvent`, fields: {
+    }
+});
+export const CampaignDeletedEvent = new MoveStruct({
+    name: `${$moduleName}::CampaignDeletedEvent`, fields: {
         campaign_id: bcs.Address
-    } });
-export const NewContributionEvent = new MoveStruct({ name: `${$moduleName}::NewContributionEvent`, fields: {
+    }
+});
+export const NewContributionEvent = new MoveStruct({
+    name: `${$moduleName}::NewContributionEvent`, fields: {
         campaign_id: bcs.Address,
         amount: bcs.u64(),
         contributor: bcs.Address,
         is_new: bcs.bool()
-    } });
-export const CampaignCompletedEvent = new MoveStruct({ name: `${$moduleName}::CampaignCompletedEvent`, fields: {
+    }
+});
+export const CampaignCompletedEvent = new MoveStruct({
+    name: `${$moduleName}::CampaignCompletedEvent`, fields: {
         campaign_id: bcs.Address
-    } });
-export const WithdrawEvent = new MoveStruct({ name: `${$moduleName}::WithdrawEvent`, fields: {
+    }
+});
+export const WithdrawEvent = new MoveStruct({
+    name: `${$moduleName}::WithdrawEvent`, fields: {
         campaign_id: bcs.Address,
         amount: bcs.u64(),
         is_full_withdrawal: bcs.bool(),
         contributor: bcs.Address
-    } });
-export const NFTPurchasedEvent = new MoveStruct({ name: `${$moduleName}::NFTPurchasedEvent`, fields: {
+    }
+});
+export const NFTPurchasedEvent = new MoveStruct({
+    name: `${$moduleName}::NFTPurchasedEvent`, fields: {
         campaign_id: bcs.Address
-    } });
-export const NFTListedEvent = new MoveStruct({ name: `${$moduleName}::NFTListedEvent`, fields: {
+    }
+});
+export const NFTListedEvent = new MoveStruct({
+    name: `${$moduleName}::NFTListedEvent`, fields: {
         campaign_id: bcs.Address
-    } });
-export const NFTDelistedEvent = new MoveStruct({ name: `${$moduleName}::NFTDelistedEvent`, fields: {
+    }
+});
+export const NFTDelistedEvent = new MoveStruct({
+    name: `${$moduleName}::NFTDelistedEvent`, fields: {
         campaign_id: bcs.Address
-    } });
-export const NFTActionError = new MoveEnum({ name: `${$moduleName}::NFTActionError`, fields: {
+    }
+});
+export const NFTActionError = new MoveEnum({
+    name: `${$moduleName}::NFTActionError`, fields: {
         Listing: null,
         Purchasing: null,
         Delisting: null
-    } });
-export const NFTActionErrorEvent = new MoveStruct({ name: `${$moduleName}::NFTActionErrorEvent`, fields: {
+    }
+});
+export const NFTActionErrorEvent = new MoveStruct({
+    name: `${$moduleName}::NFTActionErrorEvent`, fields: {
         campaign_id: bcs.Address,
         error_type: NFTActionError
-    } });
-export const NFTStatus = new MoveEnum({ name: `${$moduleName}::NFTStatus`, fields: {
+    }
+});
+export const WalletAddressSetEvent = new MoveStruct({
+    name: `${$moduleName}::WalletAddressSetEvent`, fields: {
+        campaign_id: bcs.Address,
+        wallet_address: bcs.Address
+    }
+});
+export const NFTStatus = new MoveEnum({
+    name: `${$moduleName}::NFTStatus`, fields: {
         Purchased: null,
         Listed: null,
         Delisted: null
-    } });
+    }
+});
 export interface CreateArguments {
     nftId: RawTransactionArgument<string>;
     url: RawTransactionArgument<string>;
     imageUrl: RawTransactionArgument<string>;
     rank: RawTransactionArgument<number | bigint>;
     name: RawTransactionArgument<string>;
+    nftType: RawTransactionArgument<string>;
     description: RawTransactionArgument<string>;
     target: RawTransactionArgument<number | bigint>;
     minContribution: RawTransactionArgument<number | bigint>;
@@ -101,6 +139,7 @@ export interface CreateOptions {
         imageUrl: RawTransactionArgument<string>,
         rank: RawTransactionArgument<number | bigint>,
         name: RawTransactionArgument<string>,
+        nftType: RawTransactionArgument<string>,
         description: RawTransactionArgument<string>,
         target: RawTransactionArgument<number | bigint>,
         minContribution: RawTransactionArgument<number | bigint>,
@@ -116,12 +155,13 @@ export function create(options: CreateOptions) {
         'u64',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
+        '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         'u64',
         'u64',
         '0x0000000000000000000000000000000000000000000000000000000000000002::coin::Coin<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
         '0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock'
     ] satisfies string[];
-    const parameterNames = ["nftId", "url", "imageUrl", "rank", "name", "description", "target", "minContribution", "contribution"];
+    const parameterNames = ["nftId", "url", "imageUrl", "rank", "name", "nftType", "description", "target", "minContribution", "contribution"];
     return (tx: Transaction) => tx.moveCall({
         package: packageAddress,
         module: 'campaign',
@@ -211,6 +251,7 @@ export interface SetNftStatusArguments {
     url: RawTransactionArgument<string>;
     rank: RawTransactionArgument<number | bigint>;
     name: RawTransactionArgument<string>;
+    nftType: RawTransactionArgument<string>;
 }
 export interface SetNftStatusOptions {
     package?: string;
@@ -222,7 +263,8 @@ export interface SetNftStatusOptions {
         imageUrl: RawTransactionArgument<string>,
         url: RawTransactionArgument<string>,
         rank: RawTransactionArgument<number | bigint>,
-        name: RawTransactionArgument<string>
+        name: RawTransactionArgument<string>,
+        nftType: RawTransactionArgument<string>
     ];
 }
 export function setNftStatus(options: SetNftStatusOptions) {
@@ -235,9 +277,10 @@ export function setNftStatus(options: SetNftStatusOptions) {
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         'u64',
+        '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String'
     ] satisfies string[];
-    const parameterNames = ["campaign", "status", "Cap", "nftId", "imageUrl", "url", "rank", "name"];
+    const parameterNames = ["campaign", "status", "Cap", "nftId", "imageUrl", "url", "rank", "name", "nftType"];
     return (tx: Transaction) => tx.moveCall({
         package: packageAddress,
         module: 'campaign',

@@ -354,3 +354,25 @@ export function proposalType(options: ProposalTypeOptions) {
         arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
     });
 }
+export interface NewListProposalTypeArguments {
+    price: RawTransactionArgument<number | bigint>;
+}
+export interface NewListProposalTypeOptions {
+    package?: string;
+    arguments: NewListProposalTypeArguments | [
+        price: RawTransactionArgument<number | bigint>
+    ];
+}
+export function newListProposalType(options: NewListProposalTypeOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        'u64'
+    ] satisfies string[];
+    const parameterNames = ["price"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'proposal',
+        function: 'new_list_proposal_type',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
