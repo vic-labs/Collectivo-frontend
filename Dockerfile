@@ -11,11 +11,11 @@ COPY packages/shared-types ./packages/shared-types/
 # Copy frontend application
 COPY frontend ./frontend/
 
+# Install dependencies from workspace root (must be done here!)
+RUN bun install
+
 # Set working directory to frontend
 WORKDIR /app/frontend
-
-# Install dependencies (includes workspace packages)
-RUN bun install
 
 # Build the app for production
 RUN bun run build
