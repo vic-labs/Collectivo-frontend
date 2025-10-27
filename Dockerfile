@@ -8,7 +8,8 @@ COPY package.json bun.lockb ./
 # Copy shared types package
 COPY packages/shared-types ./packages/shared-types/
 
-# Copy frontend application
+# Copy all workspace folders (Bun needs all declared workspaces to be present)
+COPY api ./api/
 COPY frontend ./frontend/
 
 # Install dependencies from workspace root (must be done here!)
