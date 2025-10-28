@@ -4,6 +4,7 @@ import {
 	Scripts,
 	createRootRouteWithContext,
 } from '@tanstack/react-router';
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -25,7 +26,7 @@ import appCss from '../styles.css?url';
 import { networkConfig } from '@/lib/sui-network-config';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { SuiClient } from '@mysten/sui/client';
 
 export const Route = createRootRouteWithContext<{
@@ -41,7 +42,7 @@ export const Route = createRootRouteWithContext<{
 				content: 'width=device-width, initial-scale=1',
 			},
 			{
-				title: 'TanStack Start Starter',
+				title: 'Collectivo',
 			},
 		],
 		links: [
@@ -55,36 +56,34 @@ export const Route = createRootRouteWithContext<{
 	component: RootComponent,
 });
 function RootComponent() {
-	const queryClient = new QueryClient();
-
 	return (
-		<QueryClientProvider client={queryClient}>
-			<SuiClientProvider
-				defaultNetwork='testnet'
-				networks={networkConfig}
-				createClient={(network, config) => {
-					return new SuiClient({
-						network,
-						url: config.url,
-						mvr: {
-							overrides: {
-								packages: {
-									'@local-pkg/lets-own': config.variables.PKG_ID,
-								},
+		<SuiClientProvider
+			defaultNetwork='testnet'
+			networks={networkConfig}
+			createClient={(network, config) => {
+				return new SuiClient({
+					network,
+					url: config.url,
+					mvr: {
+						overrides: {
+							packages: {
+								'@local-pkg/lets-own': config.variables.PKG_ID,
 							},
 						},
-					});
-				}}>
-				<WalletProvider autoConnect>
-					<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
-						<RootDocument>
+					},
+				});
+			}}>
+			<WalletProvider autoConnect>
+				<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
+					<RootDocument>
+						<NuqsAdapter>
 							<Navbar />
 							<Outlet />
-						</RootDocument>
-					</ThemeProvider>
-				</WalletProvider>
-			</SuiClientProvider>
-		</QueryClientProvider>
+						</NuqsAdapter>
+					</RootDocument>
+				</ThemeProvider>
+			</WalletProvider>
+		</SuiClientProvider>
 	);
 }
 
