@@ -1,14 +1,4 @@
-import {
-	HeadContent,
-	Outlet,
-	Scripts,
-	createRootRouteWithContext,
-} from '@tanstack/react-router';
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import { ThemeProvider } from '@/components/theme-provider';
-import '@mysten/dapp-kit/dist/index.css';
 import '@fontsource/albert-sans/400.css';
 import '@fontsource/albert-sans/500.css';
 import '@fontsource/albert-sans/600.css';
@@ -20,14 +10,24 @@ import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/montserrat/800.css';
 import '@fontsource/montserrat/900.css';
-import { Navbar } from '@/components/Navbar';
+import '@mysten/dapp-kit/dist/index.css';
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import {
+	HeadContent,
+	Outlet,
+	Scripts,
+	createRootRouteWithContext,
+} from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 
-import appCss from '../styles.css?url';
+import { Navbar } from '@/components/navbar';
 import { networkConfig } from '@/lib/sui-network-config';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { QueryClient } from '@tanstack/react-query';
 import { SuiClient } from '@mysten/sui/client';
+import { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;

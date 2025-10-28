@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { createSerializer, debounce } from 'nuqs/server';
+import { debounce } from 'nuqs/server';
 import { useQueryState, useQueryStates } from 'nuqs';
 import {
 	parseAsString,
@@ -19,8 +19,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const typeOptions = [
 	{ label: 'Active', value: 'active' },
-	{ label: 'Inactive', value: 'inactive' },
-	{ label: 'All', value: 'all' },
+	{ label: 'Completed', value: 'completed' },
 ];
 
 const sortByOptions = [
@@ -30,46 +29,39 @@ const sortByOptions = [
 
 export const campaignsQueryParsers = {
 	creator: parseAsString,
-	isActive: parseAsBoolean.withDefault(true),
-	isCompleted: parseAsBoolean,
+	isActive: parseAsBoolean,
+	isCompleted: parseAsBoolean.withDefault(false),
 	sortBy: parseAsStringLiteral(['createdAt', 'suiRaised']).withDefault('createdAt'),
 	sortOrder: parseAsStringLiteral(['asc', 'desc']).withDefault('desc'),
 	limit: parseAsInteger,
 	page: parseAsInteger,
-	search: parseAsString,
-	isAll: parseAsBoolean.withDefault(false),
 };
-
-export const serializeCampaignsQuery = createSerializer(campaignsQueryParsers);
 
 export const SearchFilter = () => {
 	const [search, setSearch] = useQueryState('search', parseAsString.withDefault('').withOptions({
 		history: 'push',
 		shallow: false,
 		limitUrlUpdates: debounce(500),
-		clearOnDefault: true,
 	}));
 
 	const [filters, setFilters] = useQueryStates(campaignsQueryParsers, {
 		history: 'push',
-		shallow: false,
-		limitUrlUpdates: debounce(500),
-		clearOnDefault: true,
+		shallow: true,
 	});
 
 	return (
 		<div className='flex gap-2 max-w-3xl mt-5'>
 			<Input
 				className='bg-white'
-				type='text'
+				type='search'
 				placeholder='Search NFT by name, ID or the::type'
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
 			/>
 			<TypeFilter
-				type={filters.isAll ? 'all' : filters.isActive ? 'active' : 'inactive'}
+				type={filters.isActive ? 'active' : 'completed'}
 				setType={(type) =>
-					setFilters({ ...filters, isActive: type === 'active' ? true : false, isAll: type === 'all' ? true : false })
+					setFilters({ ...filters, isActive: type === 'active' })
 				}
 			/>
 			<SortFilter

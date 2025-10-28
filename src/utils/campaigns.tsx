@@ -1,41 +1,45 @@
-import { serializeCampaignsQuery } from '@/components/campaigns/Search-Filter';
+
 import { API_ENDPOINT } from '@/lib/constants';
-import { Campaign } from '@collectivo/shared-types';
+import { Campaign, CampaignAPIQueryFilters, campaignsQueryParserschema } from '@collectivo/shared-types';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { objectToQueryString } from '@/lib/app-utils';
 
-export const campaignsQueryParserschema = z.object({
-	creator: z.string().optional(),
-	isActive: z.boolean().optional().default(true),
-	isCompleted: z.boolean().optional(),
-	sortBy: z.enum(['createdAt', 'suiRaised']).optional().default('createdAt'),
-	sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
-	limit: z.coerce.number().optional().default(20),
-	page: z.coerce.number().optional().default(1),
-	search: z.string().optional(),
-});
 
 export const getCampaigns = createServerFn({ method: 'GET' })
 	.inputValidator(campaignsQueryParserschema)
 	.handler(async ({ data }) => {
-		const query = serializeCampaignsQuery(data);
+		const query = objectToQueryString(data);
+
 		const res = await fetch(`${API_ENDPOINT}/campaigns${query}`.trim());
+		
+		if (!res.ok) {
+			console.error('❌ API error:', res.status, res.statusText);
+			throw new Error(`Failed to fetch campaigns: ${res.status} ${res.statusText}`);
+		}
+		
 		const response = (await res.json()) as {
 			data: Campaign[];
 			success: boolean;
 			error: string | null;
 		};
+		
 		if (!response.success) {
 			throw new Error(response.error ?? 'Failed to fetch campaigns');
 		}
+		
+		console.log('✅ Campaigns fetched:', response.data.length);
 		return response.data;
 	});
 
 
-	export const campaignsQueryOptions = (data: z.infer<typeof campaignsQueryParserschema>) => {
+	export const campaignsQueryOptions = (data: CampaignAPIQueryFilters) => {
+		// Only use search and limit in the queryKey to avoid refetching on filter/sort changes
+		const queryKey = ['campaigns', { search: data.search, limit: data.limit, page: data.page }];
+		
 		return {
-			queryKey: ['campaigns', data],
-			queryFn: () => getCampaigns({ data }),
+			queryKey,
+			queryFn: () => getCampaigns({ data: { search: data.search, limit: data.limit } }),
 		};
 	};
 
@@ -44,6 +48,12 @@ export const getCampaigns = createServerFn({ method: 'GET' })
 		.inputValidator(z.object({ id: z.string() }))
 		.handler(async ({ data }) => {
 			const res = await fetch(`${API_ENDPOINT}/campaigns/${data.id}`.trim());
+			
+			if (!res.ok) {
+				console.error('❌ API error:', res.status, res.statusText);
+				throw new Error(`Failed to fetch campaign: ${res.status} ${res.statusText}`);
+			}
+			
 			const response = (await res.json()) as {
 				data: Campaign;
 				success: boolean;
