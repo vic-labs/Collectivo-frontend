@@ -8,9 +8,15 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CampaignsRouteImport } from './routes/campaigns'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CampaignsLayoutRouteImport } from './routes/campaigns/_layout'
+import { Route as CampaignsLayoutIndexRouteImport } from './routes/campaigns/_layout/index'
+import { Route as CampaignsLayoutCampaignIdRouteImport } from './routes/campaigns/_layout/$campaignId'
+
+const CampaignsRouteImport = createFileRoute('/campaigns')()
 
 const CampaignsRoute = CampaignsRouteImport.update({
   id: '/campaigns',
@@ -22,31 +28,58 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CampaignsLayoutRoute = CampaignsLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => CampaignsRoute,
+} as any)
+const CampaignsLayoutIndexRoute = CampaignsLayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CampaignsLayoutRoute,
+} as any)
+const CampaignsLayoutCampaignIdRoute =
+  CampaignsLayoutCampaignIdRouteImport.update({
+    id: '/$campaignId',
+    path: '/$campaignId',
+    getParentRoute: () => CampaignsLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/campaigns': typeof CampaignsRoute
+  '/campaigns': typeof CampaignsLayoutRouteWithChildren
+  '/campaigns/$campaignId': typeof CampaignsLayoutCampaignIdRoute
+  '/campaigns/': typeof CampaignsLayoutIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/campaigns': typeof CampaignsRoute
+  '/campaigns': typeof CampaignsLayoutIndexRoute
+  '/campaigns/$campaignId': typeof CampaignsLayoutCampaignIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/campaigns': typeof CampaignsRoute
+  '/campaigns': typeof CampaignsRouteWithChildren
+  '/campaigns/_layout': typeof CampaignsLayoutRouteWithChildren
+  '/campaigns/_layout/$campaignId': typeof CampaignsLayoutCampaignIdRoute
+  '/campaigns/_layout/': typeof CampaignsLayoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/campaigns'
+  fullPaths: '/' | '/campaigns' | '/campaigns/$campaignId' | '/campaigns/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/campaigns'
-  id: '__root__' | '/' | '/campaigns'
+  to: '/' | '/campaigns' | '/campaigns/$campaignId'
+  id:
+    | '__root__'
+    | '/'
+    | '/campaigns'
+    | '/campaigns/_layout'
+    | '/campaigns/_layout/$campaignId'
+    | '/campaigns/_layout/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CampaignsRoute: typeof CampaignsRoute
+  CampaignsRoute: typeof CampaignsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +98,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/campaigns/_layout': {
+      id: '/campaigns/_layout'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof CampaignsLayoutRouteImport
+      parentRoute: typeof CampaignsRoute
+    }
+    '/campaigns/_layout/': {
+      id: '/campaigns/_layout/'
+      path: '/'
+      fullPath: '/campaigns/'
+      preLoaderRoute: typeof CampaignsLayoutIndexRouteImport
+      parentRoute: typeof CampaignsLayoutRoute
+    }
+    '/campaigns/_layout/$campaignId': {
+      id: '/campaigns/_layout/$campaignId'
+      path: '/$campaignId'
+      fullPath: '/campaigns/$campaignId'
+      preLoaderRoute: typeof CampaignsLayoutCampaignIdRouteImport
+      parentRoute: typeof CampaignsLayoutRoute
+    }
   }
 }
 
+interface CampaignsLayoutRouteChildren {
+  CampaignsLayoutCampaignIdRoute: typeof CampaignsLayoutCampaignIdRoute
+  CampaignsLayoutIndexRoute: typeof CampaignsLayoutIndexRoute
+}
+
+const CampaignsLayoutRouteChildren: CampaignsLayoutRouteChildren = {
+  CampaignsLayoutCampaignIdRoute: CampaignsLayoutCampaignIdRoute,
+  CampaignsLayoutIndexRoute: CampaignsLayoutIndexRoute,
+}
+
+const CampaignsLayoutRouteWithChildren = CampaignsLayoutRoute._addFileChildren(
+  CampaignsLayoutRouteChildren,
+)
+
+interface CampaignsRouteChildren {
+  CampaignsLayoutRoute: typeof CampaignsLayoutRouteWithChildren
+}
+
+const CampaignsRouteChildren: CampaignsRouteChildren = {
+  CampaignsLayoutRoute: CampaignsLayoutRouteWithChildren,
+}
+
+const CampaignsRouteWithChildren = CampaignsRoute._addFileChildren(
+  CampaignsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CampaignsRoute: CampaignsRoute,
+  CampaignsRoute: CampaignsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

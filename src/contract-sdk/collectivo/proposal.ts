@@ -376,3 +376,42 @@ export function newListProposalType(options: NewListProposalTypeOptions) {
         arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
     });
 }
+export interface NewDelistProposalTypeOptions {
+    package?: string;
+    arguments?: [
+    ];
+}
+export function newDelistProposalType(options: NewDelistProposalTypeOptions = {}) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'proposal',
+        function: 'new_delist_proposal_type',
+    });
+}
+export interface NewApprovalVoteTypeOptions {
+    package?: string;
+    arguments?: [
+    ];
+}
+export function newApprovalVoteType(options: NewApprovalVoteTypeOptions = {}) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'proposal',
+        function: 'new_approval_vote_type',
+    });
+}
+export interface NewRejectionVoteTypeOptions {
+    package?: string;
+    arguments?: [
+    ];
+}
+export function newRejectionVoteType(options: NewRejectionVoteTypeOptions = {}) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'proposal',
+        function: 'new_rejection_vote_type',
+    });
+}

@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { debounce } from 'nuqs/server';
-import { useQueryState, useQueryStates } from 'nuqs';
+import { useQueryStates } from 'nuqs';
 import {
 	parseAsString,
 	parseAsBoolean,
@@ -29,46 +29,48 @@ const sortByOptions = [
 
 export const campaignsQueryParsers = {
 	creator: parseAsString,
-	isActive: parseAsBoolean,
-	isCompleted: parseAsBoolean.withDefault(false),
-	sortBy: parseAsStringLiteral(['createdAt', 'suiRaised']).withDefault('createdAt'),
+	isActive: parseAsBoolean.withDefault(true),
+	sortBy: parseAsStringLiteral(['createdAt', 'suiRaised']).withDefault(
+		'createdAt'
+	),
 	sortOrder: parseAsStringLiteral(['asc', 'desc']).withDefault('desc'),
 	limit: parseAsInteger,
 	page: parseAsInteger,
-};
-
-export const SearchFilter = () => {
-	const [search, setSearch] = useQueryState('search', parseAsString.withDefault('').withOptions({
+	search: parseAsString.withDefault('').withOptions({
 		history: 'push',
 		shallow: false,
 		limitUrlUpdates: debounce(500),
-	}));
+	}),
+};
 
+export const SearchFilter = () => {
 	const [filters, setFilters] = useQueryStates(campaignsQueryParsers, {
 		history: 'push',
 		shallow: true,
 	});
 
 	return (
-		<div className='flex gap-2 max-w-3xl mt-5'>
+		<div className='flex flex-wrap lg:flex-nowrap gap-2 max-w-3xl mt-5'>
 			<Input
 				className='bg-white'
 				type='search'
 				placeholder='Search NFT by name, ID or the::type'
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
+				value={filters.search}
+				onChange={(e) => setFilters({ search: e.target.value })}
 			/>
-			<TypeFilter
-				type={filters.isActive ? 'active' : 'completed'}
-				setType={(type) =>
-					setFilters({ ...filters, isActive: type === 'active' })
-				}
-			/>
-			<SortFilter
-				sortBy={filters.sortBy}
-				sortOrder={filters.sortOrder}
-				onSortChange={(sortBy, sortOrder) => setFilters({ sortBy, sortOrder })}
-			/>
+			<div className='flex items-center gap-2'>
+				<TypeFilter
+					type={filters.isActive ? 'active' : 'completed'}
+					setType={(type) => setFilters({ isActive: type === 'active' })}
+				/>
+				<SortFilter
+					sortBy={filters.sortBy}
+					sortOrder={filters.sortOrder}
+					onSortChange={(sortBy, sortOrder) =>
+						setFilters({ sortBy, sortOrder })
+					}
+				/>
+			</div>
 		</div>
 	);
 };
@@ -102,7 +104,6 @@ function TypeFilter({
 	);
 }
 
-
 function SortFilter({
 	sortBy,
 	sortOrder,
@@ -110,7 +111,10 @@ function SortFilter({
 }: {
 	sortBy: 'createdAt' | 'suiRaised';
 	sortOrder: 'asc' | 'desc';
-	onSortChange: (sortBy: 'createdAt' | 'suiRaised', sortOrder: 'asc' | 'desc') => void;
+	onSortChange: (
+		sortBy: 'createdAt' | 'suiRaised',
+		sortOrder: 'asc' | 'desc'
+	) => void;
 }) {
 	const handleSortOrderToggle = () => {
 		const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
@@ -121,13 +125,19 @@ function SortFilter({
 		<div className='flex items-center'>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant='outline' className='flex items-center gap-2 rounded-r-none border-r-0'>
+					<Button
+						variant='outline'
+						className='flex items-center gap-2 rounded-r-none border-r-0'>
 						{sortByOptions.find((option) => option.value === sortBy)?.label}
 						<ChevronDown className='size-4' />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='w-44 mr-2'>
-					<DropdownMenuRadioGroup value={sortBy} onValueChange={(value) => onSortChange(value as 'createdAt' | 'suiRaised', sortOrder)}>
+					<DropdownMenuRadioGroup
+						value={sortBy}
+						onValueChange={(value) =>
+							onSortChange(value as 'createdAt' | 'suiRaised', sortOrder)
+						}>
 						{sortByOptions.map((option) => (
 							<DropdownMenuRadioItem key={option.value} value={option.value}>
 								{option.label}
@@ -136,16 +146,21 @@ function SortFilter({
 					</DropdownMenuRadioGroup>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<Button 
-				variant='outline' 
+			<Button
+				variant='outline'
 				className='flex flex-col gap-0 rounded-l-none px-2 py-1 h-auto min-h-[36px]'
-				onClick={handleSortOrderToggle}
-			>
-				<ChevronUp 
-					className={`size-3 -mb-1 ${sortOrder === 'asc' ? 'text-foreground' : 'text-muted-foreground/40'}`} 
+				onClick={handleSortOrderToggle}>
+				<ChevronUp
+					className={`size-3 -mb-1 ${
+						sortOrder === 'asc' ? 'text-foreground' : 'text-muted-foreground/40'
+					}`}
 				/>
-				<ChevronDown 
-					className={`size-3 -mt-1 ${sortOrder === 'desc' ? 'text-foreground' : 'text-muted-foreground/40'}`} 
+				<ChevronDown
+					className={`size-3 -mt-1 ${
+						sortOrder === 'desc'
+							? 'text-foreground'
+							: 'text-muted-foreground/40'
+					}`}
 				/>
 			</Button>
 		</div>

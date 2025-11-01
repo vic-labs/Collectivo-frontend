@@ -15,6 +15,7 @@ import { Menu, Moon, Sun, Monitor } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { useState } from 'react';
 import { ConnectButton } from '@mysten/dapp-kit';
+import { CreateCampaign } from './campaigns/create-campaign';
 
 const links = [
 	{
@@ -57,7 +58,7 @@ export const Navbar = () => {
 				</ul>
 			</nav>
 			<div className='hidden md:flex items-center gap-4'>
-				<ConnectButton className='!bg-primary !text-white' />
+				<ConnectButton className='bg-primary! text-white! hover:bg-primary/90! transition-colors!' />
 				<ModeToggle />
 			</div>
 
@@ -86,6 +87,9 @@ const MobileNavbar = () => {
 						</Link>
 					</DropdownMenuItem>
 				))}
+				<DropdownMenuItem className='text-base border'>
+					<CreateCampaign />
+				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger className='text-base font-medium'>

@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router';
+
 export const Cta = () => {
 	return (
 		<section className='py-8 px-2 lg:px-0 md:py-20 relative bg-white dark:bg-black/80 rounded-xl'>
@@ -11,8 +13,18 @@ export const Cta = () => {
 				</p>
 			</div>
 			<div className='flex flex-col lg:flex-row gap-4 justify-center items-center mt-8'>
-				<button className='btn-primary-big'>Start Co-Owning</button>
-				<button className='btn-secondary-big'>Browse Campaigns</button>
+				<Link
+					to='/campaigns'
+					search={undefined as any}
+					className='btn-primary-big'>
+					Start Co-Owning
+				</Link>
+				<Link
+					to='/campaigns'
+					search={undefined as any}
+					className='btn-secondary-big'>
+					Browse Campaigns
+				</Link>
 			</div>
 		</section>
 	);

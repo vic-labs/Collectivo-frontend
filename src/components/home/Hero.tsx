@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { Check } from 'lucide-react';
 
 export const Hero = () => {
@@ -18,8 +19,18 @@ export const Hero = () => {
 						</div>
 
 						<div className='flex flex-col lg:flex-row gap-4'>
-							<button className='btn-primary-big'>Start Co-Owning</button>
-							<button className='btn-secondary-big'>Browse Campaigns</button>
+							<Link
+								to='/campaigns'
+								search={undefined as any}
+								className='btn-primary-big'>
+								Start Co-Owning
+							</Link>
+							<Link
+								to='/campaigns'
+								search={undefined as any}
+								className='btn-secondary-big'>
+								Browse Campaigns
+							</Link>
 						</div>
 
 						<div className='space-y-4 pt-8'>

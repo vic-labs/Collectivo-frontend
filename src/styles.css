@@ -12,8 +12,8 @@ body {
 }
 
 code {
-	font-family:
-		source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
 }
 
 @theme inline {
@@ -128,20 +128,15 @@ code {
 	--spacing: 0.25rem;
 	--shadow-2xs: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.05);
 	--shadow-xs: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.05);
-	--shadow-sm:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-sm: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 1px 2px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 1px 2px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow-md:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-md: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 2px 4px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow-lg:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-lg: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 4px 6px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow-xl:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-xl: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 8px 10px -1px hsl(240 10% 3.9% / 0.1);
 	--shadow-2xl: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.25);
 	--tracking-normal: normal;
@@ -194,20 +189,15 @@ code {
 	--spacing: 0.25rem;
 	--shadow-2xs: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.05);
 	--shadow-xs: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.05);
-	--shadow-sm:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-sm: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 1px 2px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 1px 2px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow-md:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-md: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 2px 4px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow-lg:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-lg: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 4px 6px -1px hsl(240 10% 3.9% / 0.1);
-	--shadow-xl:
-		0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
+	--shadow-xl: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.1),
 		0rem 8px 10px -1px hsl(240 10% 3.9% / 0.1);
 	--shadow-2xl: 0rem 0.25rem 1rem 0rem hsl(240 10% 3.9% / 0.25);
 }

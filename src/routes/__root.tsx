@@ -58,7 +58,7 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
 	return (
 		<SuiClientProvider
-			defaultNetwork='testnet'
+			defaultNetwork='devnet'
 			networks={networkConfig}
 			createClient={(network, config) => {
 				return new SuiClient({
