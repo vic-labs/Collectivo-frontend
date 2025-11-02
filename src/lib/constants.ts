@@ -19,7 +19,7 @@ export const suiMainnetClient = new SuiClient({
     url: getFullnodeUrl('mainnet'),
 });
 
-export const API_ENDPOINT = import.meta.env.DEV ? 'http://localhost:4444' : 'https://collectivo-api.viclabs.dev';
+export const API_ENDPOINT = import.meta.env.DEV ? 'http://localhost:4444' : 'https://collectivo-api-proxy.nnadivictory316.workers.dev';
 
 export const EXPLORER_TX_URL = ({ chain, txHash }: { chain: 'testnet' | 'mainnet' | 'devnet', txHash: string }) => `https://suiscan.xyz/${chain}/tx/${txHash}`;
 
