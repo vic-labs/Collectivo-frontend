@@ -1,4 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
+
 import '@fontsource/albert-sans/400.css';
 import '@fontsource/albert-sans/500.css';
 import '@fontsource/albert-sans/600.css';
@@ -67,7 +69,7 @@ function RootComponent() {
 					mvr: {
 						overrides: {
 							packages: {
-								'@local-pkg/lets-own': config.variables.PKG_ID,
+								'@local-pkg/collectivo': config.variables.PKG_ID,
 							},
 						},
 					},
@@ -79,6 +81,7 @@ function RootComponent() {
 						<NuqsAdapter>
 							<Navbar />
 							<Outlet />
+							<Toaster />
 						</NuqsAdapter>
 					</RootDocument>
 				</ThemeProvider>
@@ -117,7 +120,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				/>
 			</head>
 			<body>
-				<main className='mx-auto w-full max-w-[95%]'>{children}</main>
+				<main>{children}</main>
 				<TanStackDevtools
 					config={{
 						position: 'bottom-left',

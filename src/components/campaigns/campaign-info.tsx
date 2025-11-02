@@ -1,9 +1,12 @@
 import { Campaign } from '@collectivo/shared-types';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { formatAddress, formatSuiAmount } from '@/lib/app-utils';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 
 export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
+	const account = useCurrentAccount();
 
 	return (
 		<div className='space-y-6'>
@@ -54,7 +57,9 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Raised
 						</p>
-						<p className='text-2xl font-bold'>{campaign.suiRaised} SUI</p>
+						<p className='text-2xl font-bold'>
+							{formatSuiAmount(campaign.suiRaised)} SUI
+						</p>
 					</div>
 					<div className='space-y-1'>
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
@@ -73,7 +78,7 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 							Creator
 						</p>
 						<p className='text-sm font-mono truncate'>
-							{campaign.creator.slice(0, 6)}...{campaign.creator.slice(-4)}
+							{formatAddress(campaign.creator, account?.address)}
 						</p>
 					</div>
 				</div>

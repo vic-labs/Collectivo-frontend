@@ -7,8 +7,8 @@ export const Route = createFileRoute('/campaigns/_layout')({
 
 function RouteComponent() {
 	return (
-		<section className='mt- py-10 bg-primary/7 min-h-screen w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]'>
-			<div className='max-w-[95%] mx-auto px-4'>
+		<section className='py-10 bg-primary/7 min-h-screen relative'>
+			<div className='max-w-[95%] mx-auto px-4 overflow-x-hidden'>
 				<Outlet />
 			</div>
 		</section>

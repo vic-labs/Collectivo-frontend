@@ -4,13 +4,20 @@ import { createFileRoute } from '@tanstack/react-router';
 import { CampaignInfo } from '@/components/campaigns/campaign-info';
 import { CampaignActions } from '@/components/campaigns/campaign-actions';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
+
+export type CampaignAndDetails = {
+	campaign: Campaign;
+	withdrawals: Withdrawal[];
+	contributions: Contribution[];
+};
 
 export const Route = createFileRoute('/campaigns/_layout/$campaignId')({
 	component: RouteComponent,
 	loader: async ({ context, params }) => {
 		await context.queryClient.ensureQueryData(
 			campaignQueryOptions(params.campaignId)
-		)
+		);
 	},
 });
 
@@ -22,7 +29,7 @@ function RouteComponent() {
 	const account = useCurrentAccount();
 
 	return (
-		<div className='container mx-auto py-8 px-4'>
+		<div className='container mx-auto py-8 lg:px-4'>
 			<div className='grid lg:grid-cols-2 lg:gap-20 max-w-7xl mx-auto gap-10'>
 				{/* Left: Campaign Info */}
 				<div>
@@ -40,5 +47,5 @@ function RouteComponent() {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

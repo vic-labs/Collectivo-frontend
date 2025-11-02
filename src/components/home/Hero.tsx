@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 
 export const Hero = () => {
 	return (
-		<section className='py-8 md:py-24 bg-primary/5 -mx-[2.5%] px-[2.5%] relative overflow-x-hidden'>
+		<section className='py-8 md:py-24 bg-primary/5 relative overflow-x-hidden'>
 			<div className='mx-auto w-full max-w-[95%]'>
 				<div className='grid lg:grid-cols-2 gap-12 items-center'>
 					<div className='space-y-8'>

@@ -1,7 +1,12 @@
 import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { formatAddress, formatSuiAmount } from '@/lib/app-utils';
+import { Withdraw } from './withdraw';
+import { ConnectButton } from '@mysten/dapp-kit';
+import { Contribute } from './contribute';
+import { useNetwork } from '@/lib/hooks/useNetwork';
+import { EXPLORER_TX_URL } from '@/lib/constants';
 
 type CampaignActionsProps = {
 	campaign: Campaign;
@@ -16,6 +21,7 @@ export const CampaignActions = ({
 	withdrawals,
 	userAddress,
 }: CampaignActionsProps) => {
+	const network = useNetwork();
 	// Calculate user's contribution and withdrawals
 	const userContributions = contributions
 		.filter((c) => c.contributor === userAddress)
@@ -26,7 +32,6 @@ export const CampaignActions = ({
 		.reduce((sum, w) => sum + w.amount, 0);
 
 	const userBalance = userContributions - userWithdrawals;
-	const canWithdraw = userBalance > 0;
 	const isActive = campaign.status === 'Active';
 
 	return (
@@ -34,37 +39,29 @@ export const CampaignActions = ({
 			{/* Action Buttons */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Join the Collective</CardTitle>
+					<CardTitle>Ready to co-own?</CardTitle>
 					<p className='text-sm text-muted-foreground'>
 						Fund together, own together
 					</p>
 				</CardHeader>
 				<CardContent className='space-y-3'>
-					<Button
-						className='w-full'
-						size='lg'
-						disabled={!isActive || !userAddress}>
-						{!userAddress
-							? 'Connect Wallet'
-							: !isActive
-							? 'Campaign Ended'
-							: 'Contribute'}
-					</Button>
-					<Button
-						variant='outline'
-						className='w-full'
-						size='lg'
-						disabled={!canWithdraw || !userAddress}>
-						{!userAddress
-							? 'Connect to Withdraw'
-							: !canWithdraw
-							? 'No Balance to Withdraw'
-							: `Withdraw ${userBalance} SUI`}
-					</Button>
+					{userAddress && isActive ? (
+						<Contribute campaign={campaign} />
+					) : (
+						<ConnectButton className='bg-primary! w-full text-white!' />
+					)}
+					{userAddress && (
+						<Withdraw
+							campaign={campaign}
+							contributions={contributions}
+							withdrawals={withdrawals}
+							userAddress={userAddress}
+						/>
+					)}
 					{userBalance > 0 && (
 						<p className='text-xs text-center text-muted-foreground'>
-							Your contribution: {userContributions} SUI | Withdrawn:{' '}
-							{userWithdrawals} SUI
+							Your contribution: {formatSuiAmount(userContributions)} SUI |
+							Withdrawn: {formatSuiAmount(userWithdrawals)} SUI
 						</p>
 					)}
 				</CardContent>
@@ -73,9 +70,9 @@ export const CampaignActions = ({
 			{/* Activity Feed */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Live Activity</CardTitle>
+					<CardTitle>Activity</CardTitle>
 					<p className='text-sm text-muted-foreground'>
-						Track contributions in real-time
+						Contributions and withdrawals
 					</p>
 				</CardHeader>
 				<CardContent>
@@ -84,27 +81,18 @@ export const CampaignActions = ({
 							No activity yet. Be the first to contribute!
 						</p>
 					) : (
-						<div className='space-y-3'>
+						<div className='space-y-3 max-h-[300px] overflow-y-scroll'>
 							{/* Combine and sort activities */}
-							{[
-								...contributions.map((c) => ({
-									type: 'contribution' as const,
-									amount: c.amount,
-									address: c.contributor,
-									date: new Date(c.contributedAt),
-								})),
-								...withdrawals.map((w) => ({
-									type: 'withdrawal' as const,
-									amount: w.amount,
-									address: w.contributor,
-									date: new Date(w.withdrawnAt),
-								})),
-							]
-								.sort((a, b) => b.date.getTime() - a.date.getTime())
-								.slice(0, 10)
-								.map((activity, index) => (
+							{combineAndSortActivities(contributions, withdrawals).map(
+								(activity, index) => (
 									<div key={index}>
-										<div className='flex items-center justify-between py-2'>
+										<a
+											href={EXPLORER_TX_URL({
+												chain: network,
+												txHash: activity.txHash || '',
+											})}
+											target='_blank'
+											className='flex items-center justify-between py-2 hover:bg-primary/5 px-1 rounded-t-lg'>
 											<div className='flex items-center gap-3'>
 												<div
 													className={`w-2 h-2 rounded-full ${
@@ -118,25 +106,25 @@ export const CampaignActions = ({
 														{activity.type === 'contribution'
 															? 'Contributed'
 															: 'Withdrew'}{' '}
-														{activity.amount} SUI
+														{formatSuiAmount(activity.amount)} SUI
 													</p>
 													<p className='text-xs text-muted-foreground font-mono'>
-														{activity.address.slice(0, 6)}...
-														{activity.address.slice(-4)}
+														{formatAddress(activity.address, userAddress)}
 													</p>
 												</div>
 											</div>
 											<p className='text-xs text-muted-foreground'>
 												{formatTimeAgo(activity.date)}
 											</p>
-										</div>
+										</a>
 										{index <
 											Math.min(
 												9,
 												contributions.length + withdrawals.length - 1
 											) && <Separator />}
 									</div>
-								))}
+								)
+							)}
 						</div>
 					)}
 				</CardContent>
@@ -153,4 +141,27 @@ function formatTimeAgo(date: Date): string {
 	if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
 	if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
 	return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+function combineAndSortActivities(
+	contributions: Contribution[],
+	withdrawals: Withdrawal[]
+) {
+	const activities = [
+		...contributions.map((c) => ({
+			type: 'contribution' as const,
+			amount: c.amount,
+			address: c.contributor,
+			date: new Date(c.contributedAt),
+			txHash: c.txDigest,
+		})),
+		...withdrawals.map((w) => ({
+			type: 'withdrawal' as const,
+			amount: w.amount,
+			address: w.contributor,
+			date: new Date(w.withdrawnAt),
+			txHash: w.txDigest,
+		})),
+	];
+	return activities.sort((a, b) => b.date.getTime() - a.date.getTime());
 }

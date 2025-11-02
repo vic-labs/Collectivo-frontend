@@ -9,7 +9,7 @@ import {
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { objectToQueryString } from '@/lib/app-utils';
-import { queryOptions } from '@tanstack/react-query';
+import { QueryClient, queryOptions } from '@tanstack/react-query';
 
 type CampaignAndDetails = {
 	campaign: Campaign;
@@ -86,5 +86,45 @@ export const campaignQueryOptions = (id: string) => {
 	return queryOptions({
 		queryKey: ['campaign', id],
 		queryFn: () => getCampaign({ data: { id } }),
+	});
+};
+
+export const updateCampaignQueryData = (
+	queryClient: QueryClient,
+	campaignId: string,
+	updates: {
+		suiRaisedChange?: number; // Amount to add/subtract from suiRaised
+		newContribution?: Contribution;
+		newWithdrawal?: Withdrawal;
+	}
+) => {
+	const queryKey = ['campaign', campaignId];
+
+	queryClient.setQueryData(queryKey, (oldData: CampaignAndDetails) => {
+		const updatedData = { ...oldData };
+
+		// Update campaign suiRaised if change provided
+		if (updates.suiRaisedChange !== undefined) {
+			console.log('Updating suiRaised', updates.suiRaisedChange);
+			updatedData.campaign = {
+				...oldData.campaign,
+				suiRaised: oldData.campaign.suiRaised + updates.suiRaisedChange,
+			};
+		}
+
+		// Add new contribution if provided
+		if (updates.newContribution) {
+			updatedData.contributions = [
+				...oldData.contributions,
+				updates.newContribution,
+			];
+		}
+
+		// Add new withdrawal if provided
+		if (updates.newWithdrawal) {
+			updatedData.withdrawals = [...oldData.withdrawals, updates.newWithdrawal];
+		}
+
+		return updatedData;
 	});
 };

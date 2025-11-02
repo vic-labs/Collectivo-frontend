@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+::-webkit-scrollbar {
+	width: 3px;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--primary);
+}
+
 body {
 	@apply m-0 text-lg;
 	font-family: 'Albert Sans', sans-serif;

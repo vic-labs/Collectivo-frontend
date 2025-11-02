@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Link } from '@tanstack/react-router';
+import { formatSuiAmount } from '@/lib/app-utils';
 
 export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
@@ -56,17 +57,23 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 						<Progress value={progressPercentage} className='h-2' />
 						<div className='flex justify-between text-sm'>
 							<span className='text-muted-foreground font-medium'>Raised</span>
-							<span className='font-bold'>{campaign.suiRaised} SUI</span>
+							<span className='font-bold'>
+								{formatSuiAmount(campaign.suiRaised)} SUI
+							</span>
 						</div>
 						<div className='flex justify-between text-sm'>
 							<span className='text-muted-foreground font-medium'>Target</span>
-							<span className='font-bold'>{campaign.target} SUI</span>
+							<span className='font-bold'>
+								{formatSuiAmount(campaign.target)} SUI
+							</span>
 						</div>
 						<div className='flex justify-between text-sm'>
 							<span className='text-muted-foreground font-medium'>
 								Min. contribution
 							</span>
-							<span className='font-bold'>{campaign.minContribution} SUI</span>
+							<span className='font-bold'>
+								{formatSuiAmount(campaign.minContribution)} SUI
+							</span>
 						</div>
 					</div>
 				</CardContent>
