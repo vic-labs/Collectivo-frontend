@@ -1,4 +1,5 @@
 import { ModeToggle } from '@/components/mode-toggle';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,7 +15,13 @@ import { Link } from '@tanstack/react-router';
 import { Menu, Moon, Sun, Monitor, LogIn, LogOut } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { useState } from 'react';
-import { ConnectButton, useCurrentAccount, useConnectWallet, useDisconnectWallet, useWallets } from '@mysten/dapp-kit';
+import {
+	ConnectButton,
+	useCurrentAccount,
+	useConnectWallet,
+	useDisconnectWallet,
+	useWallets,
+} from '@mysten/dapp-kit';
 import { CreateCampaign } from './campaigns/create-campaign';
 
 const links = [
@@ -84,26 +91,24 @@ const MobileConnectButton = () => {
 		disconnectWallet();
 	};
 
-	if (currentAccount) {
-		return (
-			<button 
-				onClick={handleDisconnect}
-				className='flex items-center gap-2 px-3 py-2 text-sm border border-primary/20 rounded-md hover:bg-primary/10 transition-colors'
-			>
-				<LogOut className='size-4' />
-				Log Out
-			</button>
-		);
-	}
-
 	return (
-		<button 
-			onClick={handleConnect}
-			className='flex items-center gap-2 px-3 py-2 text-sm border border-primary/20 rounded-md hover:bg-primary/10 transition-colors'
+		<Button
+			onClick={currentAccount ? handleDisconnect : handleConnect}
+			variant="outline"
+			className="w-full justify-start"
 		>
-			<LogIn className='size-4' />
-			Log In
-		</button>
+			{currentAccount ? (
+				<>
+					<LogOut className="size-4 mr-2" />
+					Log Out
+				</>
+			) : (
+				<>
+					<LogIn className="size-4 mr-2" />
+					Log In
+				</>
+			)}
+		</Button>
 	);
 };
 

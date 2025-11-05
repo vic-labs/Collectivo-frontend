@@ -130,6 +130,71 @@ export const updateCampaignQueryData = (
 	});
 };
 
+type UserCampaign = {
+	id: string;
+	creator: string;
+	nft: any;
+	description: string;
+	target: string;
+	suiRaised: string;
+	minContribution: string;
+	status: 'Active' | 'Completed';
+	createdAt: Date;
+	completedAt: Date | null;
+	deletedAt: Date | null;
+	walletAddress: string | null;
+	contributions: Array<{
+		id: number;
+		campaignId: string;
+		contributor: string;
+		amount: string;
+		contributedAt: Date;
+		txDigest: string | null;
+	}>;
+	withdrawals: Array<{
+		id: number;
+		campaignId: string;
+		contributor: string;
+		amount: string;
+		isFullWithdrawal: boolean;
+		withdrawnAt: Date;
+		txDigest: string | null;
+	}>;
+};
+
+export const getCampaignsByUser = createServerFn({ method: 'GET' })
+	.inputValidator(z.object({ address: z.string() }))
+	.handler(async ({ data }) => {
+		const res = await fetch(`${API_ENDPOINT}/users/${data.address}/campaigns`);
+
+		if (!res.ok) {
+			console.error('❌ API error:', res.status, res.statusText);
+			throw new Error(
+				`Failed to fetch user campaigns: ${res.status} ${res.statusText}`
+			);
+		}
+
+		const response = (await res.json()) as {
+			data: UserCampaign[];
+			success: boolean;
+			error: string | null;
+		};
+
+		if (!response.success) {
+			throw new Error(response.error ?? 'Failed to fetch user campaigns');
+		}
+
+		console.log('✅ User campaigns fetched:', response.data.length);
+		return response.data;
+	});
+
+export const userCampaignsQueryOptions = (address: string) => {
+	return queryOptions({
+		queryKey: ['user-campaigns', address],
+		queryFn: () => getCampaignsByUser({ data: { address } }),
+	});
+};
+
 export function createEmptyCampaignCache({
 	campaign,
 	txHash,
