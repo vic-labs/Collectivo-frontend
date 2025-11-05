@@ -33,9 +33,8 @@ import * as campaignModule from '@/contract-sdk/collectivo/campaign';
 import { Transaction } from '@mysten/sui/transactions';
 import { NewCampaign } from '@collectivo/shared-types';
 import { useRouter } from '@tanstack/react-router';
-import {
-	createEmptyCampaignCache,
-} from '@/utils/campaigns';
+import { createEmptyCampaignCache } from '@/utils/campaigns';
+import { cn } from '@/lib/utils';
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 
@@ -189,21 +188,27 @@ export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
 					});
 
 					// Extract campaign ID from NewCampaignEvent
-					const newCampaignEvent = finalResult.events?.find(
-						(event) => event.type.includes('NewCampaignEvent')
+					const newCampaignEvent = finalResult.events?.find((event) =>
+						event.type.includes('NewCampaignEvent')
 					);
 
-					const campaignId = (newCampaignEvent?.parsedJson as any)?.campaign_id as string;
+					const campaignId = (newCampaignEvent?.parsedJson as any)
+						?.campaign_id as string;
 
 					if (!campaignId) {
-						throw new Error('Could not extract campaign ID from transaction events');
+						throw new Error(
+							'Could not extract campaign ID from transaction events'
+						);
 					}
 
 					// Update cache with campaign ID
 					const campaignWithId = { ...campaign, id: campaignId };
 					queryClient.setQueryData(
 						['campaign', campaignId],
-						createEmptyCampaignCache({ campaign: campaignWithId, txHash: result.digest })
+						createEmptyCampaignCache({
+							campaign: campaignWithId,
+							txHash: result.digest,
+						})
 					);
 
 					queryClient.invalidateQueries({
@@ -248,7 +253,7 @@ export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button className='text-base'>
+				<Button className={cn('text-base', isNavbar && 'w-full')}>
 					<span className='lg:hidden'>
 						{!isNavbar ? 'Create' : 'Create Campaign'}
 					</span>{' '}
@@ -353,7 +358,8 @@ export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
 										onChange={(e) =>
 											setCustomFields({
 												...customFields,
-												minContribution: e.target.value === '' ? null : Number(e.target.value),
+												minContribution:
+													e.target.value === '' ? null : Number(e.target.value),
 											})
 										}
 									/>
@@ -375,7 +381,8 @@ export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
 										onChange={(e) =>
 											setCustomFields({
 												...customFields,
-												creatorContribution: e.target.value === '' ? null : Number(e.target.value),
+												creatorContribution:
+													e.target.value === '' ? null : Number(e.target.value),
 											})
 										}
 									/>

@@ -94,17 +94,16 @@ const MobileConnectButton = () => {
 	return (
 		<Button
 			onClick={currentAccount ? handleDisconnect : handleConnect}
-			variant="outline"
-			className="w-full justify-start"
-		>
+			variant='outline'
+			className='w-full justify-start'>
 			{currentAccount ? (
 				<>
-					<LogOut className="size-4 mr-2" />
+					<LogOut className='size-4 mr-2' />
 					Log Out
 				</>
 			) : (
 				<>
-					<LogIn className="size-4 mr-2" />
+					<LogIn className='size-4 mr-2' />
 					Log In
 				</>
 			)}
@@ -122,7 +121,7 @@ const MobileNavbar = () => {
 			<DropdownMenuTrigger className='block md:hidden '>
 				<Menu className='size-8 border-2 border-primary/20 rounded-md p-[2px]' />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className='space-y-2 font-medium'>
+			<DropdownMenuContent className='space-y-2 font-medium w-[200px]'>
 				{links.map((link) => (
 					<DropdownMenuItem className='text-base border' key={link.href}>
 						<Link
