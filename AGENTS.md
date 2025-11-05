@@ -25,5 +25,6 @@
 - **Contract SDK** (`src/contract-sdk/`) - Generated blockchain interaction layer (DO NOT EDIT)
 - **Data Layer** (`src/utils/`) - API queries and data fetching with React Query
 - **Routing** (`src/routes/`) - Page-level composition, data loading via loaders
-- **Component Architecture**: Break complex components into smaller sub-components, keep helper functions separate from component logic</content>
+- **Component Architecture**: Break complex components into smaller sub-components, keep helper functions separate from component logic
+- **Type Reuse**: Always import and reuse existing types from utils instead of redefining them locally</content>
 <parameter name="filePath">/Users/user/Desktop/SUI-MOVE/collectivo/frontend/AGENTS.md

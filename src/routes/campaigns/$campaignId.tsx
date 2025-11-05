@@ -6,11 +6,6 @@ import { CampaignActions } from '@/components/campaigns/campaign-actions';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
 
-export type CampaignAndDetails = {
-	campaign: Campaign;
-	withdrawals: Withdrawal[];
-	contributions: Contribution[];
-};
 
 export const Route = createFileRoute('/campaigns/$campaignId')({
 	component: RouteComponent,

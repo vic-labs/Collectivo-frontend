@@ -12,11 +12,6 @@ import { z } from 'zod';
 import { objectToQueryString } from '@/lib/app-utils';
 import { QueryClient, queryOptions } from '@tanstack/react-query';
 
-type CampaignAndDetails = {
-	campaign: Campaign;
-	withdrawals: Withdrawal[];
-	contributions: Contribution[];
-};
 
 export const getCampaigns = createServerFn({ method: 'GET' })
 	.inputValidator(campaignsQueryParserschema)
@@ -128,38 +123,6 @@ export const updateCampaignQueryData = (
 
 		return updatedData;
 	});
-};
-
-type UserCampaign = {
-	id: string;
-	creator: string;
-	nft: any;
-	description: string;
-	target: string;
-	suiRaised: string;
-	minContribution: string;
-	status: 'Active' | 'Completed';
-	createdAt: Date;
-	completedAt: Date | null;
-	deletedAt: Date | null;
-	walletAddress: string | null;
-	contributions: Array<{
-		id: number;
-		campaignId: string;
-		contributor: string;
-		amount: string;
-		contributedAt: Date;
-		txDigest: string | null;
-	}>;
-	withdrawals: Array<{
-		id: number;
-		campaignId: string;
-		contributor: string;
-		amount: string;
-		isFullWithdrawal: boolean;
-		withdrawnAt: Date;
-		txDigest: string | null;
-	}>;
 };
 
 export const getCampaignsByUser = createServerFn({ method: 'GET' })
