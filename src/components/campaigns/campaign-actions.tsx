@@ -1,13 +1,13 @@
 import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Spinner } from '@/components/ui/spinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatAddress, formatSuiAmount } from '@/lib/app-utils';
-import { Withdraw } from './withdraw';
+import { ContributeWithdraw } from './contribute-withdraw';
 import { ConnectButton } from '@mysten/dapp-kit';
-import { Contribute } from './contribute';
 import { useNetwork } from '@/lib/hooks/useNetwork';
 import { EXPLORER_TX_URL } from '@/lib/constants';
+import { useState } from 'react';
 
 type CampaignActionsProps = {
 	campaign: Campaign;
@@ -23,6 +23,8 @@ export const CampaignActions = ({
 	userAddress,
 }: CampaignActionsProps) => {
 	const network = useNetwork();
+	const [activityFilter, setActivityFilter] = useState<'all' | 'mine'>('all');
+	
 	// Calculate user's contribution and withdrawals
 	const userContributions = contributions
 		.filter((c) => c.contributor === userAddress)
@@ -35,116 +37,128 @@ export const CampaignActions = ({
 	const userBalance = userContributions - userWithdrawals;
 	const isActive = campaign.status === 'Active';
 
+	// Filter activities based on selected tab
+	const filteredContributions = activityFilter === 'mine' && userAddress
+		? contributions.filter(c => c.contributor === userAddress)
+		: contributions;
+	
+	const filteredWithdrawals = activityFilter === 'mine' && userAddress
+		? withdrawals.filter(w => w.contributor === userAddress)
+		: withdrawals;
+
 	return (
-		<div className='space-y-6 sticky top-4 self-start'>
-			{/* Action Buttons */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Ready to co-own?</CardTitle>
-					<p className='text-sm text-muted-foreground'>
-						Fund together, own together
-					</p>
-				</CardHeader>
-				<CardContent className='space-y-3'>
-					{isActive ? (
-						userAddress ? (
-							<Contribute campaign={campaign} />
+		<div className='space-y-6'>
+			{/* Campaign Status / Actions */}
+			{isActive ? (
+				<Card>
+					<CardHeader>
+						<CardTitle>Ready to co-own?</CardTitle>
+						<p className='text-sm text-muted-foreground'>
+							Fund together, own together
+						</p>
+					</CardHeader>
+					<CardContent className='space-y-3'>
+						{userAddress ? (
+							<ContributeWithdraw 
+								mode="contribute"
+								campaign={campaign}
+								contributions={contributions}
+								withdrawals={withdrawals}
+								userAddress={userAddress}
+							/>
 						) : (
 							<ConnectButton className='bg-primary! w-full text-white!' />
-						)
-					) : (
-						<div className='text-center py-4'>
-							<p className='text-lg font-semibold text-green-600'>Campaign Completed!</p>
-							<p className='text-sm text-muted-foreground mt-1'>
-								This campaign has successfully reached its funding goal.
+						)}
+						{userAddress && (
+							<ContributeWithdraw 
+								mode="withdraw"
+								campaign={campaign}
+								contributions={contributions}
+								withdrawals={withdrawals}
+								userAddress={userAddress}
+							/>
+						)}
+						{userBalance > 0 && (
+							<p className='text-xs text-center text-muted-foreground'>
+								Your contribution: {formatSuiAmount(userContributions)} SUI |
+								Withdrawn: {formatSuiAmount(userWithdrawals)} SUI
 							</p>
-							{!campaign.nft.isPurchased && (
-								<div className='flex items-center justify-center gap-2 mt-3'>
-									<Spinner className='size-4' />
-									<p className='text-sm font-medium text-yellow-600'>
-										NFT pending purchase
-									</p>
-								</div>
-							)}
-						</div>
-					)}
-					{userAddress && isActive && (
-						<Withdraw
-							campaign={campaign}
-							contributions={contributions}
-							withdrawals={withdrawals}
-							userAddress={userAddress}
-						/>
-					)}
-					{userBalance > 0 && (
-						<p className='text-xs text-center text-muted-foreground'>
-							Your contribution: {formatSuiAmount(userContributions)} SUI |
-							Withdrawn: {formatSuiAmount(userWithdrawals)} SUI
-						</p>
-					)}
-				</CardContent>
-			</Card>
+						)}
+					</CardContent>
+				</Card>
+			) : null}
 
 			{/* Activity Feed */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Activity</CardTitle>
-					<p className='text-sm text-muted-foreground'>
-						Contributions and withdrawals
-					</p>
+					<div className='flex items-center justify-between'>
+						<div>
+							<CardTitle>Activity</CardTitle>
+							<p className='text-sm text-muted-foreground'>
+								Recent contributions and withdrawals
+							</p>
+						</div>
+					</div>
 				</CardHeader>
 				<CardContent>
-					{contributions.length === 0 && withdrawals.length === 0 ? (
-						<p className='text-sm text-muted-foreground text-center py-8'>
-							No activity yet. Be the first to contribute!
-						</p>
-					) : (
-						<div className='space-y-3 max-h-[300px] overflow-y-scroll'>
-							{/* Combine and sort activities */}
-							{combineAndSortActivities(contributions, withdrawals).map(
-								(activity, index) => (
-									<div key={index}>
-										<a
-											href={EXPLORER_TX_URL({
-												chain: network,
-												txHash: activity.txHash || '',
-											})}
-											target='_blank'
-											className='flex items-center justify-between py-2 hover:bg-primary/5 px-1 rounded-t-lg'>
-											<div className='flex items-center gap-3'>
-												<div
-													className={`w-2 h-2 rounded-full ${
-														activity.type === 'contribution'
-															? 'bg-green-500'
-															: 'bg-orange-500'
-													}`}
-												/>
-												<div>
-													<p className='text-sm font-medium'>
-														{activity.type === 'contribution'
-															? 'Contributed'
-															: 'Withdrew'}{' '}
-														{formatSuiAmount(activity.amount)} SUI
+					<Tabs value={activityFilter} onValueChange={(v) => setActivityFilter(v as 'all' | 'mine')} className="w-full">
+						<TabsList className="grid w-full grid-cols-2 mb-4">
+							<TabsTrigger value="all">All</TabsTrigger>
+							<TabsTrigger value="mine" disabled={!userAddress}>My Activity</TabsTrigger>
+						</TabsList>
+						<TabsContent value={activityFilter} className="mt-0">
+							{filteredContributions.length === 0 && filteredWithdrawals.length === 0 ? (
+								<p className='text-sm text-muted-foreground text-center py-8'>
+									{activityFilter === 'mine' ? 'You have no activity yet.' : 'No activity yet. Be the first to contribute!'}
+								</p>
+							) : (
+								<div className='space-y-3 max-h-[400px] overflow-y-auto'>
+									{combineAndSortActivities(filteredContributions, filteredWithdrawals).map(
+										(activity, index) => (
+											<div key={index}>
+												<a
+													href={EXPLORER_TX_URL({
+														chain: network,
+														txHash: activity.txHash || '',
+													})}
+													target='_blank'
+													className='flex items-center justify-between py-2 hover:bg-primary/5 px-1 rounded-t-lg transition-colors'>
+													<div className='flex items-center gap-3'>
+														<div
+															className={`w-2 h-2 rounded-full ${
+																activity.type === 'contribution'
+																	? 'bg-green-500'
+																	: 'bg-orange-500'
+															}`}
+														/>
+														<div>
+															<p className='text-sm font-medium'>
+																{activity.type === 'contribution'
+																	? 'Contributed'
+																	: 'Withdrew'}{' '}
+																{formatSuiAmount(activity.amount)} SUI
+															</p>
+															<p className='text-xs text-muted-foreground font-mono'>
+																{formatAddress(activity.address, userAddress)}
+															</p>
+														</div>
+													</div>
+													<p className='text-xs text-muted-foreground'>
+														{formatTimeAgo(activity.date)}
 													</p>
-													<p className='text-xs text-muted-foreground font-mono'>
-														{formatAddress(activity.address, userAddress)}
-													</p>
-												</div>
+												</a>
+												{index <
+													Math.min(
+														9,
+														filteredContributions.length + filteredWithdrawals.length - 1
+													) && <Separator />}
 											</div>
-											<p className='text-xs text-muted-foreground'>
-												{formatTimeAgo(activity.date)}
-											</p>
-										</a>
-										{index <
-											Math.min(
-												9,
-												contributions.length + withdrawals.length - 1
-											) && <Separator />}
-									</div>
-								)
+										)
+									)}
+								</div>
 							)}
-						</div>
-					)}
+						</TabsContent>
+					</Tabs>
 				</CardContent>
 			</Card>
 		</div>

@@ -1,13 +1,18 @@
 // Shared types for frontend application
 
-import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
+import { Campaign, Contribution, Proposal, Vote, Withdrawal } from '@collectivo/shared-types';
 
 // Campaign related types
 declare global {
+	type ProposalWithVotes = Proposal & {
+		votes: Vote[];
+	};
+
 	type CampaignAndDetails = {
 		campaign: Campaign;
 		withdrawals: Withdrawal[];
 		contributions: Contribution[];
+		proposals: ProposalWithVotes[];
 	};
 
 	type UserCampaign = {
@@ -19,26 +24,13 @@ declare global {
 		suiRaised: string;
 		minContribution: string;
 		status: 'Active' | 'Completed';
+		totalContributors: number;
 		createdAt: Date;
 		completedAt: Date | null;
 		deletedAt: Date | null;
 		walletAddress: string | null;
-		contributions: Array<{
-			id: number;
-			campaignId: string;
-			contributor: string;
-			amount: string;
-			contributedAt: Date;
-			txDigest: string | null;
-		}>;
-		withdrawals: Array<{
-			id: number;
-			campaignId: string;
-			contributor: string;
-			amount: string;
-			isFullWithdrawal: boolean;
-			withdrawalAt: Date;
-			txDigest: string | null;
-		}>;
+		contributions: Contribution[];
+		withdrawals: Withdrawal[];
+		proposals: Proposal[];
 	};
 }

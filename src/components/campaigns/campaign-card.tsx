@@ -1,12 +1,17 @@
-import { Campaign, CampaignAPIQueryFilters } from '@collectivo/shared-types';
+import { CampaignWithContributors } from '@collectivo/shared-types';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Link } from '@tanstack/react-router';
 import { formatSuiAmount } from '@/lib/app-utils';
 import { RankBadge } from '../rank-badge';
+import { Users } from 'lucide-react';
 
-export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
+export const CampaignCard = ({
+	campaign,
+}: {
+	campaign: CampaignWithContributors;
+}) => {
 	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
 
 	return (
@@ -14,10 +19,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 			to='/campaigns/$campaignId'
 			params={{
 				campaignId: campaign.id,
-			}}
-			search={(prev: CampaignAPIQueryFilters) => ({
-				...prev,
-			})}>
+			}}>
 			<Card className='overflow-hidden hover:shadow-lg transition-shadow p-0! w-full cursor-pointer'>
 				<CardHeader className='p-0! -mb-6!'>
 					<div className='relative'>
@@ -72,6 +74,15 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 							</span>
 							<span className='font-bold'>
 								{formatSuiAmount(campaign.minContribution)} SUI
+							</span>
+						</div>
+						<div className='flex items-center justify-center gap-2 pt-2 border-t text-sm'>
+							<Users className='h-4 w-4 text-muted-foreground' />
+							<span className='font-bold text-foreground'>
+								{campaign.totalContributors}
+							</span>
+							<span className='text-muted-foreground'>
+								contributor{campaign.totalContributors !== 1 ? 's' : ''}
 							</span>
 						</div>
 					</div>

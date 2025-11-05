@@ -1,9 +1,10 @@
 import { API_ENDPOINT } from '@/lib/constants';
 import {
-	Campaign,
 	CampaignAPIQueryFilters,
+	CampaignWithContributors,
 	Contribution,
 	NewCampaign,
+	Proposal,
 	Withdrawal,
 	campaignsQueryParserschema,
 } from '@collectivo/shared-types';
@@ -11,7 +12,6 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { objectToQueryString } from '@/lib/app-utils';
 import { QueryClient, queryOptions } from '@tanstack/react-query';
-
 
 export const getCampaigns = createServerFn({ method: 'GET' })
 	.inputValidator(campaignsQueryParserschema)
@@ -28,7 +28,7 @@ export const getCampaigns = createServerFn({ method: 'GET' })
 		}
 
 		const response = (await res.json()) as {
-			data: Campaign[];
+			data: CampaignWithContributors[];
 			success: boolean;
 			error: string | null;
 		};
@@ -92,6 +92,9 @@ export const updateCampaignQueryData = (
 		suiRaisedChange?: number; // Amount to add/subtract from suiRaised
 		newContribution?: Contribution;
 		newWithdrawal?: Withdrawal;
+		newProposal?: Proposal;
+		proposalId?: string;
+		statusUpdate?: 'Active' | 'Passed' | 'Rejected';
 	}
 ) => {
 	const queryKey = ['campaign', campaignId];
@@ -119,6 +122,27 @@ export const updateCampaignQueryData = (
 		// Add new withdrawal if provided
 		if (updates.newWithdrawal) {
 			updatedData.withdrawals = [...oldData.withdrawals, updates.newWithdrawal];
+		}
+
+		// Add new proposal if provided
+		if (updates.newProposal) {
+			const proposalWithVotes = {
+				...updates.newProposal,
+				votes: [], // Initialize with empty votes array
+			};
+			updatedData.proposals = [...oldData.proposals, proposalWithVotes];
+		}
+
+		// Update proposal status if provided
+		if (updates.proposalId && updates.statusUpdate) {
+			updatedData.proposals = updatedData.proposals.map((proposal) =>
+				proposal.id === updates.proposalId
+					? {
+							...proposal,
+							status: updates.statusUpdate as 'Active' | 'Passed' | 'Rejected',
+					  }
+					: proposal
+			);
 		}
 
 		return updatedData;
@@ -189,5 +213,6 @@ export function createEmptyCampaignCache({
 				txDigest: txHash,
 			},
 		],
+		proposals: [],
 	};
 }

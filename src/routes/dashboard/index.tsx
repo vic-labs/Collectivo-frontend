@@ -100,8 +100,6 @@ function RouteComponent() {
 		return sum + userContributions;
 	}, 0);
 
-	
-
 	return (
 		<div className='container mx-auto py-8'>
 			<h1 className='text-2xl font-bold mb-6'>
@@ -112,8 +110,16 @@ function RouteComponent() {
 			<div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-8'>
 				<StatCard title='Campaigns Created' value={totalCreated} />
 				<StatCard title='Campaigns Contributed' value={totalContributed} />
-				<StatCard title='SUI Raised' value={totalCreatedSUI.toFixed(2)} suiIcon />
-				<StatCard title='SUI Contributed' value={totalContributedSUI.toFixed(2)} suiIcon />
+				<StatCard
+					title='SUI Raised'
+					value={totalCreatedSUI.toFixed(2)}
+					suiIcon
+				/>
+				<StatCard
+					title='SUI Contributed'
+					value={totalContributedSUI.toFixed(2)}
+					suiIcon
+				/>
 			</div>
 
 			<Tabs defaultValue='created' className='w-full'>
@@ -146,12 +152,11 @@ function RouteComponent() {
 						</p>
 					) : (
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-							{filteredCreated.map((userCampaign) => (
-								<CampaignCard
-									key={userCampaign.id}
-									campaign={userCampaign}
-								/>
-							))}
+							{filteredCreated.map((userCampaign) => {
+								const { proposals, withdrawals, contributions, ...rest } =
+									userCampaign;
+								return <CampaignCard key={userCampaign.id} campaign={rest} />;
+							})}
 						</div>
 					)}
 				</TabsContent>
@@ -178,12 +183,11 @@ function RouteComponent() {
 						</p>
 					) : (
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-							{filteredContributed.map((userCampaign) => (
-								<CampaignCard
-									key={userCampaign.id}
-									campaign={userCampaign}
-								/>
-							))}
+							{filteredContributed.map((userCampaign) => {
+								const { proposals, withdrawals, contributions, ...rest } =
+									userCampaign;
+								return <CampaignCard key={userCampaign.id} campaign={rest} />;
+							})}
 						</div>
 					)}
 				</TabsContent>
