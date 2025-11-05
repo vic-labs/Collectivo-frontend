@@ -26,6 +26,7 @@ import { MIST_PER_SUI } from '@mysten/sui/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Loader } from 'lucide-react';
 import { ViewTxLink } from '../view-tx-link';
 
 export function Contribute({ campaign }: { campaign: Campaign }) {
@@ -36,7 +37,7 @@ export function Contribute({ campaign }: { campaign: Campaign }) {
 	const account = useCurrentAccount();
 	const { data: balance } = useAccountBalance();
 
-	const { mutateAsync: signAndExecuteTransaction } =
+	const { mutateAsync: signAndExecuteTransaction, isPending: isContributing } =
 		useSignAndExecuteTransaction();
 
 	const remainingAmount = campaign.target - campaign.suiRaised;
@@ -188,8 +189,15 @@ export function Contribute({ campaign }: { campaign: Campaign }) {
 						</DialogClose>
 						<Button
 							type='submit'
-							disabled={!amount || amount < campaign.minContribution}>
-							Contribute
+							disabled={!amount || amount < campaign.minContribution || isContributing}>
+							{isContributing ? (
+								<>
+									<Loader className='size-4 animate-spin mr-2' />
+									Contributing...
+								</>
+							) : (
+								'Contribute'
+							)}
 						</Button>
 					</DialogFooter>
 				</form>

@@ -20,9 +20,7 @@ import * as campaignModule from '@/contract-sdk/collectivo/campaign';
 import { MIST_PER_SUI } from '@mysten/sui/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { updateCampaignQueryData } from '@/utils/campaigns';
-import { BadgeAlert, BadgeCheck } from 'lucide-react';
-import { EXPLORER_TX_URL } from '@/lib/constants';
-import { useNetwork } from '@/lib/hooks/useNetwork';
+import { Loader } from 'lucide-react';
 import { formatSuiAmount } from '@/lib/app-utils';
 import { ViewTxLink } from '../view-tx-link';
 
@@ -41,11 +39,10 @@ export function Withdraw({
 }: WithdrawProps) {
 	const [amount, setAmount] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
-	const network = useNetwork();
 	const client = useSuiClient();
 	const queryClient = useQueryClient();
 
-	const { mutateAsync: signAndExecuteTransaction } =
+	const { mutateAsync: signAndExecuteTransaction, isPending: isWithdrawing } =
 		useSignAndExecuteTransaction();
 
 	// Calculate user's available balance
@@ -218,8 +215,15 @@ export function Withdraw({
 								Cancel
 							</Button>
 						</DialogClose>
-						<Button type='submit' disabled={!amount || amount <= 0}>
-							Withdraw
+						<Button type='submit' disabled={!amount || amount <= 0 || isWithdrawing}>
+							{isWithdrawing ? (
+								<>
+									<Loader className='size-4 animate-spin mr-2' />
+									Withdrawing...
+								</>
+							) : (
+								'Withdraw'
+							)}
 						</Button>
 					</DialogFooter>
 				</form>

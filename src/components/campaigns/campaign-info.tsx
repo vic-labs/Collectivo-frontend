@@ -4,6 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { formatAddress, formatSuiAmount } from '@/lib/app-utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { RankBadge } from '../rank-badge';
+import { ViewAddressLink } from '../view-tx-link';
 import { User } from 'lucide-react';
 
 export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
@@ -84,10 +85,13 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Creator
 						</p>
-						<p className='text-sm font-mono truncate flex items-center gap-2'>
-							<User className='size-4 text-muted-foreground' />
-							{formatAddress(campaign.creator, account?.address)}
-						</p>
+	<p className='text-sm font-mono truncate flex items-center gap-2'>
+		<User className='size-4 text-muted-foreground' />
+		<ViewAddressLink 
+			address={formatAddress(campaign.creator, account?.address)} 
+			fullAddress={campaign.creator} 
+		/>
+	</p>
 					</div>
 				</div>
 			</div>
