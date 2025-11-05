@@ -6,7 +6,7 @@ import { CampaignAPIQueryFilters } from '@collectivo/shared-types';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/campaigns/_layout/')({
+export const Route = createFileRoute('/campaigns/')({
 	validateSearch: (search) => {
 		return search as CampaignAPIQueryFilters;
 	},
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/campaigns/_layout/')({
 				limit: deps.limit,
 				page: deps.page,
 			} as CampaignAPIQueryFilters)
-		);
+		)
 		return { campaigns, params: deps };
 	},
 	component: RouteComponent,
@@ -63,8 +63,8 @@ function RouteComponent() {
 
 			if (aValue < bValue) return order === 'asc' ? -1 : 1;
 			if (aValue > bValue) return order === 'asc' ? 1 : -1;
-			return 0;
-		});
+			return 0
+		})
 
 	return (
 		<>
@@ -84,5 +84,5 @@ function RouteComponent() {
 				))}
 			</div>
 		</>
-	);
+	)
 }

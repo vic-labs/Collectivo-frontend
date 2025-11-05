@@ -11,10 +11,10 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Link } from '@tanstack/react-router';
-import { Menu, Moon, Sun, Monitor } from 'lucide-react';
+import { Menu, Moon, Sun, Monitor, LogIn, LogOut } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { useState } from 'react';
-import { ConnectButton } from '@mysten/dapp-kit';
+import { ConnectButton, useCurrentAccount, useConnectWallet, useDisconnectWallet, useWallets } from '@mysten/dapp-kit';
 import { CreateCampaign } from './campaigns/create-campaign';
 
 const links = [
@@ -67,9 +67,50 @@ export const Navbar = () => {
 	);
 };
 
+const MobileConnectButton = () => {
+	const currentAccount = useCurrentAccount();
+	const { mutate: connectWallet } = useConnectWallet();
+	const { mutate: disconnectWallet } = useDisconnectWallet();
+	const wallets = useWallets();
+
+	const handleConnect = () => {
+		const firstWallet = wallets[0];
+		if (firstWallet) {
+			connectWallet({ wallet: firstWallet });
+		}
+	};
+
+	const handleDisconnect = () => {
+		disconnectWallet();
+	};
+
+	if (currentAccount) {
+		return (
+			<button 
+				onClick={handleDisconnect}
+				className='flex items-center gap-2 px-3 py-2 text-sm border border-primary/20 rounded-md hover:bg-primary/10 transition-colors'
+			>
+				<LogOut className='size-4' />
+				Log Out
+			</button>
+		);
+	}
+
+	return (
+		<button 
+			onClick={handleConnect}
+			className='flex items-center gap-2 px-3 py-2 text-sm border border-primary/20 rounded-md hover:bg-primary/10 transition-colors'
+		>
+			<LogIn className='size-4' />
+			Log In
+		</button>
+	);
+};
+
 const MobileNavbar = () => {
 	const { setTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
+	const currentAccount = useCurrentAccount();
 
 	return (
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -88,7 +129,9 @@ const MobileNavbar = () => {
 					</DropdownMenuItem>
 				))}
 
-				<CreateCampaign isNavbar={true} />
+				{currentAccount && <CreateCampaign isNavbar={true} />}
+
+				<MobileConnectButton />
 
 				<DropdownMenuSeparator />
 				<DropdownMenuSub>

@@ -12,12 +12,12 @@ export type CampaignAndDetails = {
 	contributions: Contribution[];
 };
 
-export const Route = createFileRoute('/campaigns/_layout/$campaignId')({
+export const Route = createFileRoute('/campaigns/$campaignId')({
 	component: RouteComponent,
 	loader: async ({ context, params }) => {
 		await context.queryClient.ensureQueryData(
 			campaignQueryOptions(params.campaignId)
-		);
+		)
 	},
 });
 
@@ -47,5 +47,5 @@ function RouteComponent() {
 				</div>
 			</div>
 		</div>
-	);
+	)
 }
