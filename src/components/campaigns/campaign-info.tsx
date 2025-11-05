@@ -3,6 +3,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { formatAddress, formatSuiAmount } from '@/lib/app-utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { RankBadge } from '../rank-badge';
+import { User } from 'lucide-react';
 
 export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
@@ -29,9 +31,7 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 				<div>
 					<div className='flex items-center gap-3 mb-2'>
 						<h1 className='text-3xl font-bold'>{campaign.nft.name}</h1>
-						<Badge className='text-sm font-bold bg-linear-to-r from-amber-500 to-orange-500 text-white border-0 px-3 py-1'>
-							🥇 RANK {campaign.nft.rank}
-						</Badge>
+						<RankBadge rank={campaign.nft.rank} />
 					</div>
 					<p className='text-muted-foreground leading-relaxed'>
 						{campaign.description}
@@ -57,27 +57,35 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Raised
 						</p>
-						<p className='text-2xl font-bold'>
-							{formatSuiAmount(campaign.suiRaised)} SUI
+						<p className='text-2xl font-bold flex items-center gap-1'>
+							<img src='/sui.svg' alt='sui' className='size-5' />
+							{formatSuiAmount(campaign.suiRaised)}
 						</p>
 					</div>
 					<div className='space-y-1'>
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Target
 						</p>
-						<p className='text-2xl font-bold'>{campaign.target} SUI</p>
+						<p className='text-2xl font-bold flex items-center gap-1'>
+							<img src='/sui.svg' alt='sui' className='size-5' />
+							{campaign.target}
+						</p>
 					</div>
 					<div className='space-y-1'>
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Min. Contribution
 						</p>
-						<p className='text-xl font-bold'>{campaign.minContribution} SUI</p>
+						<p className='text-xl font-bold flex items-center gap-1'>
+							<img src='/sui.svg' alt='sui' className='size-4' />
+							{campaign.minContribution}
+						</p>
 					</div>
 					<div className='space-y-1'>
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Creator
 						</p>
-						<p className='text-sm font-mono truncate'>
+						<p className='text-sm font-mono truncate flex items-center gap-2'>
+							<User className='size-4 text-muted-foreground' />
 							{formatAddress(campaign.creator, account?.address)}
 						</p>
 					</div>

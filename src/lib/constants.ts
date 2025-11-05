@@ -14,12 +14,14 @@ export {
 } from '@collectivo/shared-types';
 
 export const TRADEPORT_STORE_PACKAGE_ID = '0xbff3161b047fb8b727883838c09b08afa9e0dd0f5488bde9e99e80643da9b9e0';
+export const ROYALTY_RULE_PACKAGE_ID = "0x434b5bd8f6a7b05fede0ff46c6e511d71ea326ed38056e3bcd681d2d7c2a7879";
 
 export const suiMainnetClient = new SuiClient({
     url: getFullnodeUrl('mainnet'),
 });
 
 export const API_ENDPOINT = import.meta.env.DEV ? 'http://localhost:4444' : 'https://collectivo-api-proxy.nnadivictory316.workers.dev';
+export const SUI_NFT_API = (id: string) => `https://sui-nfts-api.nnadivictory316.workers.dev/nfts/${id}`;
 
 export const EXPLORER_TX_URL = ({ chain, txHash }: { chain: 'testnet' | 'mainnet' | 'devnet', txHash: string }) => `https://suiscan.xyz/${chain}/tx/${txHash}`;
 

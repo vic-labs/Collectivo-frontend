@@ -3,6 +3,7 @@ import {
 	Campaign,
 	CampaignAPIQueryFilters,
 	Contribution,
+	NewCampaign,
 	Withdrawal,
 	campaignsQueryParserschema,
 } from '@collectivo/shared-types';
@@ -128,3 +129,37 @@ export const updateCampaignQueryData = (
 		return updatedData;
 	});
 };
+
+export function createEmptyCampaignCache({
+	campaign,
+	txHash,
+}: {
+	campaign: NewCampaign;
+	txHash: string;
+}): CampaignAndDetails {
+	return {
+		campaign: {
+			...campaign,
+			suiRaised: campaign.suiRaised ?? 0,
+			nft: campaign.nft ?? null,
+			target: campaign.target ?? 0,
+			minContribution: campaign.minContribution ?? 0,
+			status: campaign.status ?? 'Active',
+			createdAt: campaign.createdAt ?? new Date(),
+			completedAt: null,
+			deletedAt: null,
+			walletAddress: null,
+		},
+		withdrawals: [],
+		contributions: [
+			{
+				id: Date.now(),
+				campaignId: campaign.id,
+				contributor: campaign.creator,
+				amount: 0,
+				contributedAt: new Date(),
+				txDigest: txHash,
+			},
+		],
+	};
+}

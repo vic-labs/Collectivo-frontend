@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Link } from '@tanstack/react-router';
 import { formatSuiAmount } from '@/lib/app-utils';
+import { RankBadge } from '../rank-badge';
 
 export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
@@ -37,9 +38,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 						<h3 className='text-lg font-semibold line-clamp-1'>
 							{campaign.nft.name}
 						</h3>
-						<Badge className='text-xs font-bold bg-linear-to-r from-amber-500 to-orange-500 text-white border-0 px-2 shrink-0'>
-							🥇 {campaign.nft.rank}
-						</Badge>
+						<RankBadge rank={campaign.nft.rank} />
 					</div>
 					<p className='text-base text-muted-foreground mb-4 line-clamp-2'>
 						{campaign.description}

@@ -1,0 +1,225 @@
+{
+    "effects": {
+        "messageVersion": "v1",
+        "status": {
+            "status": "success"
+        },
+        "executedEpoch": "171",
+        "gasUsed": {
+            "computationCost": "1000000",
+            "storageCost": "8603200",
+            "storageRebate": "0",
+            "nonRefundableStorageFee": "0"
+        },
+        "modifiedAtVersions": [
+            {
+                "objectId": "0x3cea032e950bff6df772d0ace344e4f5baf54190e68821be9b5a5d1cbd2ee09a",
+                "sequenceNumber": "1"
+            }
+        ],
+        "sharedObjects": [
+            {
+                "objectId": "0x0000000000000000000000000000000000000000000000000000000000000006",
+                "version": 11841630,
+                "digest": "G9nSgxtoQu8MuCf4CbbhdpqRBmL6jyvK4vuxrwFP3QE6"
+            }
+        ],
+        "transactionDigest": "HcxAseMFPg2P2rbNMmNLtn3ouYpRVgWLLWDTwm46joR1",
+        "created": [
+            {
+                "owner": {
+                    "AddressOwner": "0x439ae2c715ffbe9263f1414944da00209f51ec27686a11102792a9fe8546eeb8"
+                },
+                "reference": {
+                    "objectId": "0x2f8fccc2cd7b66ab0b289a9709a72dc059cc6dfe7354b83a2e97a8995f5fa7fd",
+                    "version": 11841631,
+                    "digest": "2MwqksW8VSQ6K2apWHyje4VaKvC5DhDsbtUDCSjpTYUt"
+                }
+            },
+            {
+                "owner": {
+                    "Shared": {
+                        "initial_shared_version": 11841631
+                    }
+                },
+                "reference": {
+                    "objectId": "0x62795f73af3614133171bfed718d7640b72bd70de70b0bf1c5d2be9a55732379",
+                    "version": 11841631,
+                    "digest": "Ghe11mdu9GVfUjxSonKC7jMDRRbyKVbrcyPD6sq8sMRu"
+                }
+            },
+            {
+                "owner": {
+                    "ObjectOwner": "0x8328cf40e270fa12097818d389f35700848e92d6f9c542b9e50b689e3c286a23"
+                },
+                "reference": {
+                    "objectId": "0x6f9c0632fd3f5aa0d9b1388aaf157493b0ce9b66c97641dee231edf34226d039",
+                    "version": 11841631,
+                    "digest": "83jZim67BZfNL99cz4tdxkgJFpeT6XqcYf3Vz4nVHoAY"
+                }
+            }
+        ],
+        "mutated": [
+            {
+                "owner": {
+                    "AddressOwner": "0x26861d7c77cfb0fda10006d572c7266c3a44dea82cc356c0b159e611a707734a"
+                },
+                "reference": {
+                    "objectId": "0x3cea032e950bff6df772d0ace344e4f5baf54190e68821be9b5a5d1cbd2ee09a",
+                    "version": 11841631,
+                    "digest": "DS3Zztq8QHMwrkHt82P1xQryybsfG4XGtVRYCvzJHY1E"
+                }
+            }
+        ],
+        "gasObject": {
+            "owner": {
+                "AddressOwner": "0x26861d7c77cfb0fda10006d572c7266c3a44dea82cc356c0b159e611a707734a"
+            },
+            "reference": {
+                "objectId": "0x3cea032e950bff6df772d0ace344e4f5baf54190e68821be9b5a5d1cbd2ee09a",
+                "version": 11841631,
+                "digest": "DS3Zztq8QHMwrkHt82P1xQryybsfG4XGtVRYCvzJHY1E"
+            }
+        },
+        "eventsDigest": "6gG5e57o96Y6ort4MQLXeZrBDzJfaVEuMMDB8oDDBDdh",
+        "dependencies": [
+            "7SFCnTHnvX9mk4bVYJJoJG4ceN8TyfET7S2B2K6jBhzS",
+            "BQ8KvcJdCCmoZBAjxZdLkaKFtxgv9daUPaLFRyz4meQs"
+        ]
+    },
+    "events": [
+        {
+            "id": {
+                "txDigest": "HcxAseMFPg2P2rbNMmNLtn3ouYpRVgWLLWDTwm46joR1",
+                "eventSeq": "0"
+            },
+            "packageId": "0xaa861ae8b4727c43ddc01138dc5468546e650b2c495e9e72e738234a834f970d",
+            "transactionModule": "campaign",
+            "sender": "0x26861d7c77cfb0fda10006d572c7266c3a44dea82cc356c0b159e611a707734a",
+            "type": "0xaa861ae8b4727c43ddc01138dc5468546e650b2c495e9e72e738234a834f970d::campaign::NewContributionEvent",
+            "parsedJson": {
+                "amount": "1000000000",
+                "campaign_id": "0x62795f73af3614133171bfed718d7640b72bd70de70b0bf1c5d2be9a55732379",
+                "contributor": "0x26861d7c77cfb0fda10006d572c7266c3a44dea82cc356c0b159e611a707734a",
+                "is_new": true
+            },
+            "bcsEncoding": "base64",
+            "bcs": "Ynlfc682FBMxcb/tcY12QLcr1w3nCwvxxdK+mlVzI3kAypo7AAAAACaGHXx3z7D9oQAG1XLHJmw6RN6oLMNWwLFZ5hGnB3NKAQ=="
+        },
+        {
+            "id": {
+                "txDigest": "HcxAseMFPg2P2rbNMmNLtn3ouYpRVgWLLWDTwm46joR1",
+                "eventSeq": "1"
+            },
+            "packageId": "0xaa861ae8b4727c43ddc01138dc5468546e650b2c495e9e72e738234a834f970d",
+            "transactionModule": "campaign",
+            "sender": "0x26861d7c77cfb0fda10006d572c7266c3a44dea82cc356c0b159e611a707734a",
+            "type": "0xaa861ae8b4727c43ddc01138dc5468546e650b2c495e9e72e738234a834f970d::campaign::NewCampaignEvent",
+            "parsedJson": {
+                "campaign_id": "0x62795f73af3614133171bfed718d7640b72bd70de70b0bf1c5d2be9a55732379"
+            },
+            "bcsEncoding": "base64",
+            "bcs": "Ynlfc682FBMxcb/tcY12QLcr1w3nCwvxxdK+mlVzI3k="
+        }
+    ],
+    "results": [
+        {
+            "mutableReferenceOutputs": [
+                [
+                    "GasCoin",
+                    [
+                        60,
+                        234,
+                        3,
+                        46,
+                        149,
+                        11,
+                        255,
+                        109,
+                        247,
+                        114,
+                        208,
+                        172,
+                        227,
+                        68,
+                        228,
+                        245,
+                        186,
+                        245,
+                        65,
+                        144,
+                        230,
+                        136,
+                        33,
+                        190,
+                        155,
+                        90,
+                        93,
+                        28,
+                        189,
+                        46,
+                        224,
+                        154,
+                        128,
+                        255,
+                        85,
+                        224,
+                        4,
+                        96,
+                        3,
+                        0
+                    ],
+                    "0x2::coin::Coin<0x2::sui::SUI>"
+                ]
+            ],
+            "returnValues": [
+                [
+                    [
+                        80,
+                        97,
+                        9,
+                        220,
+                        90,
+                        178,
+                        90,
+                        32,
+                        185,
+                        247,
+                        77,
+                        28,
+                        72,
+                        157,
+                        99,
+                        29,
+                        221,
+                        106,
+                        239,
+                        132,
+                        206,
+                        223,
+                        23,
+                        37,
+                        31,
+                        44,
+                        155,
+                        129,
+                        156,
+                        187,
+                        43,
+                        203,
+                        128,
+                        96,
+                        51,
+                        60,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "0x2::coin::Coin<0x2::sui::SUI>"
+                ]
+            ]
+        },
+        {}
+    ]
+}

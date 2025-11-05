@@ -150,36 +150,36 @@ code {
 }
 
 .dark {
-	--background: oklch(0.1405 0.0044 285.8238);
+	--background: oklch(0 0 0);
 	--foreground: oklch(0.9848 0 0);
-	--card: oklch(0.1405 0.0044 285.8238);
+	--card: oklch(0 0 0);
 	--card-foreground: oklch(0.9848 0 0);
-	--popover: oklch(0.1405 0.0044 285.8238);
+	--popover: oklch(0 0 0);
 	--popover-foreground: oklch(0.9848 0 0);
 	--primary: oklch(0.6917 0.1766 50.7408);
 	--primary-foreground: oklch(0.9848 0 0);
-	--secondary: oklch(0.2741 0.0055 286.0329);
+	--secondary: oklch(0.1 0 0);
 	--secondary-foreground: oklch(0.9848 0 0);
-	--muted: oklch(0.2741 0.0055 286.0329);
+	--muted: oklch(0.1 0 0);
 	--muted-foreground: oklch(0.7119 0.0129 286.0684);
-	--accent: oklch(0.2741 0.0055 286.0329);
+	--accent: oklch(0.1 0 0);
 	--accent-foreground: oklch(0.9848 0 0);
 	--destructive: oklch(0.3959 0.1331 25.7205);
-	--border: oklch(0.2741 0.0055 286.0329);
-	--input: oklch(0.2741 0.0055 286.0329);
+	--border: oklch(0.2 0 0);
+	--input: oklch(0.2 0 0);
 	--ring: oklch(0.6917 0.1766 50.7408);
 	--chart-1: oklch(0.6917 0.1766 50.7408);
-	--chart-2: oklch(0.2741 0.0055 286.0329);
+	--chart-2: oklch(0.1 0 0);
 	--chart-3: oklch(0.7119 0.0129 286.0684);
-	--chart-4: oklch(0.1405 0.0044 285.8238);
+	--chart-4: oklch(0 0 0);
 	--chart-5: oklch(0.9848 0 0);
-	--sidebar: oklch(0.2741 0.0055 286.0329);
+	--sidebar: oklch(0.1 0 0);
 	--sidebar-foreground: oklch(0.9848 0 0);
 	--sidebar-primary: oklch(0.6917 0.1766 50.7408);
 	--sidebar-primary-foreground: oklch(0.9848 0 0);
-	--sidebar-accent: oklch(0.2741 0.0055 286.0329);
+	--sidebar-accent: oklch(0.1 0 0);
 	--sidebar-accent-foreground: oklch(0.9848 0 0);
-	--sidebar-border: oklch(0.2741 0.0055 286.0329);
+	--sidebar-border: oklch(0.2 0 0);
 	--sidebar-ring: oklch(0.6917 0.1766 50.7408);
 	--destructive-foreground: oklch(0.9848 0 0);
 	--radius: 0.5rem;
@@ -230,9 +230,9 @@ code {
 
 @layer components {
 	.btn-primary-big {
-		@apply bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors;
+		@apply bg-primary text-white px-3 lg:px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors;
 	}
 	.btn-secondary-big {
-		@apply border border-primary text-primary px-8 py-3 rounded-lg font-semibold hover:bg-primary/10 transition-colors;
+		@apply border border-primary text-primary px-3 lg:px-8 py-3 rounded-lg font-semibold hover:bg-primary/10 transition-colors;
 	}
 }

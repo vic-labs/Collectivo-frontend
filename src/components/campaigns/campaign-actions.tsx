@@ -35,7 +35,7 @@ export const CampaignActions = ({
 	const isActive = campaign.status === 'Active';
 
 	return (
-		<div className='space-y-6'>
+		<div className='space-y-6 sticky top-4 self-start'>
 			{/* Action Buttons */}
 			<Card>
 				<CardHeader>

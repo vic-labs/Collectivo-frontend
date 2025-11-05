@@ -20,6 +20,11 @@ import * as campaignModule from '@/contract-sdk/collectivo/campaign';
 import { MIST_PER_SUI } from '@mysten/sui/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { updateCampaignQueryData } from '@/utils/campaigns';
+import { BadgeAlert, BadgeCheck } from 'lucide-react';
+import { EXPLORER_TX_URL } from '@/lib/constants';
+import { useNetwork } from '@/lib/hooks/useNetwork';
+import { formatSuiAmount } from '@/lib/app-utils';
+import { ViewTxLink } from '../view-tx-link';
 
 type WithdrawProps = {
 	campaign: Campaign;
@@ -36,6 +41,7 @@ export function Withdraw({
 }: WithdrawProps) {
 	const [amount, setAmount] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
+	const network = useNetwork();
 	const client = useSuiClient();
 	const queryClient = useQueryClient();
 
@@ -124,13 +130,21 @@ export function Withdraw({
 					setIsOpen(false);
 					setAmount(null);
 
-					return `Successfully withdrew ${data.amount} SUI!`;
+					return {
+						message: `You just withdrew ${formatSuiAmount(data.amount)} SUI`,
+						action: <ViewTxLink txHash={data.digest} />,
+					};
 				},
 				error: (error) => {
+					// Extract meaningful error message
 					if (error instanceof Error) {
-						return error.message;
+						return {
+							message: error.message,
+						};
 					}
-					return 'Failed to withdraw. Please try again.';
+					return {
+						message: 'Failed to withdraw. Please try again.',
+					};
 				},
 			}
 		);

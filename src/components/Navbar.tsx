@@ -87,9 +87,9 @@ const MobileNavbar = () => {
 						</Link>
 					</DropdownMenuItem>
 				))}
-				<DropdownMenuItem className='text-base border'>
-					<CreateCampaign />
-				</DropdownMenuItem>
+
+				<CreateCampaign isNavbar={true} />
+
 				<DropdownMenuSeparator />
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger className='text-base font-medium'>

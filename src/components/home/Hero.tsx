@@ -18,7 +18,7 @@ export const Hero = () => {
 							</p>
 						</div>
 
-						<div className='flex flex-col lg:flex-row gap-4'>
+						<div className='flex flex-row gap-4'>
 							<Link
 								to='/campaigns'
 								search={undefined as any}

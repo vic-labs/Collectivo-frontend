@@ -14,7 +14,6 @@ export const ContributorInfo = new MoveStruct({ name: `${$moduleName}::Contribut
     } });
 export const NFT = new MoveStruct({ name: `${$moduleName}::NFT`, fields: {
         nft_id: bcs.Address,
-        url: bcs.string(),
         image_url: bcs.string(),
         rank: bcs.u64(),
         is_purchased: bcs.bool(),
@@ -89,7 +88,6 @@ export const NFTStatus = new MoveEnum({ name: `${$moduleName}::NFTStatus`, field
     } });
 export interface CreateArguments {
     nftId: RawTransactionArgument<string>;
-    url: RawTransactionArgument<string>;
     imageUrl: RawTransactionArgument<string>;
     rank: RawTransactionArgument<number | bigint>;
     name: RawTransactionArgument<string>;
@@ -103,7 +101,6 @@ export interface CreateOptions {
     package?: string;
     arguments: CreateArguments | [
         nftId: RawTransactionArgument<string>,
-        url: RawTransactionArgument<string>,
         imageUrl: RawTransactionArgument<string>,
         rank: RawTransactionArgument<number | bigint>,
         name: RawTransactionArgument<string>,
@@ -119,7 +116,6 @@ export function create(options: CreateOptions) {
     const argumentsTypes = [
         '0x0000000000000000000000000000000000000000000000000000000000000002::object::ID',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
-        '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         'u64',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
@@ -129,7 +125,7 @@ export function create(options: CreateOptions) {
         '0x0000000000000000000000000000000000000000000000000000000000000002::coin::Coin<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
         '0x0000000000000000000000000000000000000000000000000000000000000002::clock::Clock'
     ] satisfies string[];
-    const parameterNames = ["nftId", "url", "imageUrl", "rank", "name", "nftType", "description", "target", "minContribution", "contribution"];
+    const parameterNames = ["nftId", "imageUrl", "rank", "name", "nftType", "description", "target", "minContribution", "contribution"];
     return (tx: Transaction) => tx.moveCall({
         package: packageAddress,
         module: 'campaign',
@@ -216,7 +212,6 @@ export interface SetNftStatusArguments {
     Cap: RawTransactionArgument<string>;
     nftId: RawTransactionArgument<string>;
     imageUrl: RawTransactionArgument<string>;
-    url: RawTransactionArgument<string>;
     rank: RawTransactionArgument<number | bigint>;
     name: RawTransactionArgument<string>;
     nftType: RawTransactionArgument<string>;
@@ -229,7 +224,6 @@ export interface SetNftStatusOptions {
         Cap: RawTransactionArgument<string>,
         nftId: RawTransactionArgument<string>,
         imageUrl: RawTransactionArgument<string>,
-        url: RawTransactionArgument<string>,
         rank: RawTransactionArgument<number | bigint>,
         name: RawTransactionArgument<string>,
         nftType: RawTransactionArgument<string>
@@ -243,12 +237,11 @@ export function setNftStatus(options: SetNftStatusOptions) {
         `${packageAddress}::collectivo::AdminCap`,
         '0x0000000000000000000000000000000000000000000000000000000000000002::object::ID',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
-        '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         'u64',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String'
     ] satisfies string[];
-    const parameterNames = ["campaign", "status", "Cap", "nftId", "imageUrl", "url", "rank", "name", "nftType"];
+    const parameterNames = ["campaign", "status", "Cap", "nftId", "imageUrl", "rank", "name", "nftType"];
     return (tx: Transaction) => tx.moveCall({
         package: packageAddress,
         module: 'campaign',

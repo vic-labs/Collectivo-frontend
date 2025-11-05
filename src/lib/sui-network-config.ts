@@ -10,6 +10,7 @@ const { networkConfig, useNetworkVariable } = createNetworkConfig({
             PKG_ID: TESTNET_PACKAGE_ID,
         }
     },
+
     mainnet: {
         url: getFullnodeUrl('mainnet'),
         variables: {

@@ -1,6 +1,18 @@
 import { SuiClient } from "@mysten/sui/client";
-import { TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient } from "./constants";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
+
+export type SUI_NFT_API_RESPONSE = {
+    id: string;
+    name: string;
+    imageUrl: string;
+    listingPrice?: number;
+    type: string;
+    rank: number;
+    attributes: {
+        key: string;
+        value: string;
+    }[];
+}
 
 /**
  * Calculate the deposit amount needed to get the intended contribution after 1% fee
@@ -38,44 +50,41 @@ export function formatSuiAmount(amount: number): string {
     // Round to 9 decimal places (SUI precision) to remove floating point errors
     const rounded = Math.round(amount * 1000000000) / 1000000000;
     // Format to remove trailing zeros while preserving up to 9 decimal places
-    const formatted = rounded.toFixed(9);
+    const formatted = rounded.toFixed(2);
     // Remove trailing zeros and optional decimal point
     return formatted.replace(/\.?0+$/, '');
 }
 
-export async function getTransferPolicyId({ nftType }: { nftType: string }): Promise<string | null> {
+
+export async function getUserSuiBalance({ address, suiClient }: { address: string, suiClient: SuiClient }) {
     try {
-        const eventType = `0x2::transfer_policy::TransferPolicyCreated<${nftType}>`;
-        const response = await suiMainnetClient.queryEvents({
-            query: { MoveEventType: eventType },
-            limit: 1,
+        const balance = await suiClient.getBalance({
+            owner: address,
+            coinType: '0x2::sui::SUI',
         });
-
-        if (response.data.length > 0) {
-            const policyId = (response.data[0].parsedJson as any)?.id;
-            return policyId || null;
-        }
-
-        return null;
-    } catch (e) {
-        return null;
+        return mistToSui(balance.totalBalance);
+    } catch (error) {
+        console.error(error);
+        return 0;
     }
 }
 
+export function mistToSui(mist: bigint | string | number): number {
+    return Number(mist) / Number(MIST_PER_SUI);
+}
 
-export async function getTradeportData({ nftId }: { nftId: string }) {
-    try {
-        const field = await suiMainnetClient.getDynamicFieldObject({
-            parentId: TRADEPORT_STORE_PACKAGE_ID,
-            name: { type: '0x2::object::ID', value: nftId },
-        });
-        const fields = (field.data?.content as any)?.fields;
-        if (fields?.price && fields?.commission) {
-            const tradeportPrice = parseInt(fields.price) / Number(MIST_PER_SUI);
-            const commission = parseInt(fields.commission) / Number(MIST_PER_SUI);
-            return tradeportPrice + commission;
-        }
-    } catch (error) {
-        console.error(error);
-    }
+export function suiToMist(sui: number): bigint {
+    return BigInt(Math.floor(sui * Number(MIST_PER_SUI)));
+}
+
+export function generateCampaignId(): string {
+    return Math.random().toString(36).substring(2, 15);
+}
+
+export function formatNumberToHumanReadable(number?: number): string {
+    if (!number) return '0';
+    return number.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    });
 }

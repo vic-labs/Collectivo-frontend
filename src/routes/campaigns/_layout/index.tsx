@@ -3,7 +3,6 @@ import { CreateCampaign } from '@/components/campaigns/create-campaign';
 import { SearchFilter } from '@/components/campaigns/search-filter';
 import { campaignsQueryOptions } from '@/utils/campaigns';
 import { CampaignAPIQueryFilters } from '@collectivo/shared-types';
-import { useCurrentAccount } from '@mysten/dapp-kit';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -38,7 +37,6 @@ export const Route = createFileRoute('/campaigns/_layout/')({
 function RouteComponent() {
 	const { params } = Route.useLoaderData();
 	const { data: campaigns, error } = useQuery(campaignsQueryOptions(params));
-	const account = useCurrentAccount();
 
 	if (!campaigns) return <p>Campaigns not found</p>;
 	if (error) return <p className='text-red-500'>Error: {error.message}</p>;
@@ -71,8 +69,7 @@ function RouteComponent() {
 	return (
 		<>
 			<div className='flex justify-between items-center '>
-				<h1 className='text-2xl font-bold'>All Campaigns</h1>
-				<div className='hidden lg:block'>{account && <CreateCampaign />}</div>
+				<h1 className='text-2xl font-bold'>All Campaigns</h1> <CreateCampaign />
 			</div>
 			<SearchFilter />
 			<div className='my-6'>
