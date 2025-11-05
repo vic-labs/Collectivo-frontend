@@ -133,7 +133,7 @@ export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
 				creator: account.address,
 				description,
 				nft: nftData,
-				target: nftData?.listingPrice ?? 0,
+				target: mistToSui(nftData?.listingPrice ?? 0),
 				suiRaised: creatorContribution,
 				minContribution,
 				status: 'Active',
