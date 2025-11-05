@@ -1,6 +1,7 @@
 import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
 import { formatAddress, formatSuiAmount } from '@/lib/app-utils';
 import { Withdraw } from './withdraw';
 import { ConnectButton } from '@mysten/dapp-kit';
@@ -45,12 +46,29 @@ export const CampaignActions = ({
 					</p>
 				</CardHeader>
 				<CardContent className='space-y-3'>
-					{userAddress && isActive ? (
-						<Contribute campaign={campaign} />
+					{isActive ? (
+						userAddress ? (
+							<Contribute campaign={campaign} />
+						) : (
+							<ConnectButton className='bg-primary! w-full text-white!' />
+						)
 					) : (
-						<ConnectButton className='bg-primary! w-full text-white!' />
+						<div className='text-center py-4'>
+							<p className='text-lg font-semibold text-green-600'>Campaign Completed!</p>
+							<p className='text-sm text-muted-foreground mt-1'>
+								This campaign has successfully reached its funding goal.
+							</p>
+							{!campaign.nft.isPurchased && (
+								<div className='flex items-center justify-center gap-2 mt-3'>
+									<Spinner className='size-4' />
+									<p className='text-sm font-medium text-yellow-600'>
+										NFT pending purchase
+									</p>
+								</div>
+							)}
+						</div>
 					)}
-					{userAddress && (
+					{userAddress && isActive && (
 						<Withdraw
 							campaign={campaign}
 							contributions={contributions}

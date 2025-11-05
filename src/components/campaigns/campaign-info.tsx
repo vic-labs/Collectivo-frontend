@@ -43,14 +43,16 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 				<div className='space-y-3'>
 					<div className='flex justify-between items-center'>
 						<span className='text-sm font-medium text-muted-foreground'>
-							Funding Progress
+							{campaign.status === 'Completed' ? 'Funding Goal' : 'Funding Progress'}
 						</span>
 						<span className='text-lg font-bold'>
-							{progressPercentage.toFixed(1)}%
+							{campaign.status === 'Completed' ? '100%' : `${progressPercentage.toFixed(1)}%`}
 						</span>
 					</div>
-					<Progress value={progressPercentage} className='h-3' />
+					<Progress value={campaign.status === 'Completed' ? 100 : progressPercentage} className='h-3' />
 				</div>
+
+				
 
 				{/* Stats Grid */}
 				<div className='grid grid-cols-2 gap-4 pt-2'>
