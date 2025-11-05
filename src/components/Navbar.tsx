@@ -12,7 +12,16 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Link } from '@tanstack/react-router';
-import { Menu, Moon, Sun, Monitor, LogIn, LogOut } from 'lucide-react';
+import {
+	Menu,
+	Moon,
+	Sun,
+	Monitor,
+	LogIn,
+	LogOut,
+	Wallet,
+	ChevronDown,
+} from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { useState } from 'react';
 import {
@@ -23,6 +32,7 @@ import {
 	useWallets,
 } from '@mysten/dapp-kit';
 import { CreateCampaign } from './campaigns/create-campaign';
+import { useAccountBalance } from '@/lib/hooks/useAccountBalance';
 
 const links = [
 	{
@@ -42,6 +52,51 @@ const links = [
 		href: '/dashboard',
 	},
 ];
+
+const WalletDropdown = () => {
+	const currentAccount = useCurrentAccount();
+	const { mutate: disconnectWallet } = useDisconnectWallet();
+	const { data: balance } = useAccountBalance();
+
+	if (!currentAccount) {
+		return (
+			<ConnectButton className='bg-primary! text-white! hover:bg-primary/90! transition-colors!' />
+		);
+	}
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button className='bg-primary! text-white! hover:bg-primary/90! transition-colors!'>
+					<Wallet className='size-4 mr-2' />
+					{currentAccount.address.slice(0, 6)}...
+					{currentAccount.address.slice(-4)}
+					<ChevronDown className='size-4 ml-2' />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align='end' className='w-56'>
+				<DropdownMenuItem
+					disabled
+					className='flex items-center justify-between'>
+					<p className='text-sm'>Balance:</p>
+					<div className='flex items-center font-bold'>
+						<img src='/sui.svg' alt='SUI' className='size-4' />
+						<span>{balance ? balance.toFixed(2) : '0.00'} SUI</span>
+					</div>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem asChild>
+					<CreateCampaign isNavbar={true} />
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem onClick={() => disconnectWallet()}>
+					<LogOut className='size-4 mr-2' />
+					Log Out
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+};
 
 export const Navbar = () => {
 	return (
@@ -65,7 +120,7 @@ export const Navbar = () => {
 				</ul>
 			</nav>
 			<div className='hidden md:flex items-center gap-4'>
-				<ConnectButton className='bg-primary! text-white! hover:bg-primary/90! transition-colors!' />
+				<WalletDropdown />
 				<ModeToggle />
 			</div>
 

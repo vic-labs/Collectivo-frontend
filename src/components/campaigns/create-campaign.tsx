@@ -44,7 +44,7 @@ type CustomField = {
 	creatorContribution: number | null;
 };
 
-export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
+export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNavbar?: boolean; triggerOnly?: boolean }) {
 	const [nftId, setNftId] = useState('');
 	const account = useCurrentAccount();
 	const suiClient = useSuiClient();
@@ -250,16 +250,24 @@ export function CreateCampaign({ isNavbar = false }: { isNavbar?: boolean }) {
 		}
 	}
 
-	return (
+  const triggerButton = (
+		<Button className={cn('text-base', isNavbar && 'w-full', triggerOnly && 'w-full justify-start')}>
+			<span className='lg:hidden'>
+				{!isNavbar ? 'Create' : 'Create Campaign'}
+			</span>{' '}
+			<span className='hidden lg:block'>Create Campaign</span>{' '}
+			<Plus color='white' />{' '}
+		</Button>
+	);
+
+  if (triggerOnly) {
+    return triggerButton;
+  }
+
+  return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button className={cn('text-base', isNavbar && 'w-full')}>
-					<span className='lg:hidden'>
-						{!isNavbar ? 'Create' : 'Create Campaign'}
-					</span>{' '}
-					<span className='hidden lg:block'>Create Campaign</span>{' '}
-					<Plus color='white' />{' '}
-				</Button>
+				{triggerButton}
 			</DialogTrigger>
 			<DialogContent
 				className='sm:max-w-[450px]'

@@ -15,16 +15,18 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 const typeOptions = [
 	{ label: 'Active', value: 'active' },
 	{ label: 'Completed', value: 'completed' },
 ];
 
-const sortByOptions = [
-	{ label: 'Created At', value: 'createdAt' as const },
-	{ label: 'SUI Raised', value: 'suiRaised' as const },
+const sortOptions = [
+	{ label: 'Created At ↑', value: 'createdAt-asc' },
+	{ label: 'Created At ↓', value: 'createdAt-desc' },
+	{ label: 'SUI Raised ↑', value: 'suiRaised-asc' },
+	{ label: 'SUI Raised ↓', value: 'suiRaised-desc' },
 ];
 
 export const campaignsQueryParsers = {
@@ -116,53 +118,35 @@ function SortFilter({
 		sortOrder: 'asc' | 'desc'
 	) => void;
 }) {
-	const handleSortOrderToggle = () => {
-		const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-		onSortChange(sortBy, newOrder);
-	};
+	const currentSortValue = `${sortBy}-${sortOrder}`;
+	const currentLabel =
+		sortOptions.find((option) => option.value === currentSortValue)?.label ||
+		'Sort';
 
 	return (
-		<div className='flex items-center'>
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button
-						variant='outline'
-						className='flex items-center gap-2 rounded-r-none border-r-0'>
-						{sortByOptions.find((option) => option.value === sortBy)?.label}
-						<ChevronDown className='size-4' />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent className='w-44 mr-2'>
-					<DropdownMenuRadioGroup
-						value={sortBy}
-						onValueChange={(value) =>
-							onSortChange(value as 'createdAt' | 'suiRaised', sortOrder)
-						}>
-						{sortByOptions.map((option) => (
-							<DropdownMenuRadioItem key={option.value} value={option.value}>
-								{option.label}
-							</DropdownMenuRadioItem>
-						))}
-					</DropdownMenuRadioGroup>
-				</DropdownMenuContent>
-			</DropdownMenu>
-			<Button
-				variant='outline'
-				className='flex flex-col gap-0 rounded-l-none px-2 py-1 h-auto min-h-[36px]'
-				onClick={handleSortOrderToggle}>
-				<ChevronUp
-					className={`size-3 -mb-1 ${
-						sortOrder === 'asc' ? 'text-foreground' : 'text-muted-foreground/40'
-					}`}
-				/>
-				<ChevronDown
-					className={`size-3 -mt-1 ${
-						sortOrder === 'desc'
-							? 'text-foreground'
-							: 'text-muted-foreground/40'
-					}`}
-				/>
-			</Button>
-		</div>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant='outline' className='flex items-center gap-2'>
+					{currentLabel}
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className='w-44 mr-2'>
+				<DropdownMenuRadioGroup
+					value={currentSortValue}
+					onValueChange={(value) => {
+						const [field, order] = value.split('-') as [
+							'createdAt' | 'suiRaised',
+							'asc' | 'desc'
+						];
+						onSortChange(field, order);
+					}}>
+					{sortOptions.map((option) => (
+						<DropdownMenuRadioItem key={option.value} value={option.value}>
+							{option.label}
+						</DropdownMenuRadioItem>
+					))}
+				</DropdownMenuRadioGroup>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
