@@ -26,3 +26,10 @@ export const SUI_NFT_API = (id: string) => `https://sui-nfts-api.nnadivictory316
 export const EXPLORER_TX_URL = ({ chain, txHash }: { chain: 'testnet' | 'mainnet' | 'devnet', txHash: string }) => `https://suiscan.xyz/${chain}/tx/${txHash}`;
 
 export const EXPLORER_ADDRESS_URL = ({ chain, address }: { chain: 'testnet' | 'mainnet' | 'devnet', address: string }) => `https://suiscan.xyz/${chain}/account/${address}`;
+
+export const SPECIAL_NFT_ROYALTIES = [
+  {
+    type: '0xb07b09b016d28f989b6adda8069096da0c0a0ff6490f6e0866858c023b061bee::mystic_yeti::MysticYeti',
+    royaltyPercentage: 3.885
+  }
+] as const;

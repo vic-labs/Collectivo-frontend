@@ -1,8 +1,7 @@
 import { MIST_PER_SUI } from "@mysten/sui/utils";
-import { ROYALTY_RULE_PACKAGE_ID, TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient } from "../constants";
+import { ROYALTY_RULE_PACKAGE_ID, TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient, SPECIAL_NFT_ROYALTIES } from "../constants";
 import { bcs } from "@mysten/sui/bcs";
 import { deriveDynamicFieldID } from "@mysten/sui/utils";
-import { mistToSui } from ".";
 
 
 
@@ -87,6 +86,12 @@ export async function getNativeKioskListingPrice({
                 Math.floor((listingMist * Number(amount_bp)) / 10_000),
                 Number(min_amount)
             );
+        } else {
+            // Check for special NFT types with hardcoded royalties
+            const specialNft = SPECIAL_NFT_ROYALTIES.find(nft => nft.type === nftType);
+            if (specialNft) {
+                royaltyMist = Math.floor((listingMist * specialNft.royaltyPercentage) / 100);
+            }
         }
 
         // Platform fee (3%) in mist
