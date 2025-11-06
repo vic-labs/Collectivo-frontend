@@ -24,6 +24,9 @@ export const CampaignCard = ({
 				<CardHeader className='p-0! -mb-6!'>
 					<div className='relative'>
 						<img
+							loading='lazy'
+							decoding='async'
+							fetchPriority='low'
 							src={campaign.nft.imageUrl}
 							alt={campaign.nft.name}
 							className='w-full object-cover'

@@ -38,8 +38,12 @@ export function ContributeWithdraw({
 	const [isOpen, setIsOpen] = useState(false);
 	const { data: balance } = useAccountBalance();
 
-	const { contributeToCampaign, isContributing } = useContributeToCampaign(campaign.id);
-	const { withdrawFromCampaign, isWithdrawing } = useWithdrawFromCampaign(campaign.id);
+	const { contributeToCampaign, isContributing } = useContributeToCampaign(
+		campaign.id
+	);
+	const { withdrawFromCampaign, isWithdrawing } = useWithdrawFromCampaign(
+		campaign.id
+	);
 
 	// Calculate values based on mode
 	const remainingAmount = campaign.target - campaign.suiRaised;
@@ -57,8 +61,16 @@ export function ContributeWithdraw({
 	const isContributeMode = mode === 'contribute';
 	const isLoading = isContributeMode ? isContributing : isWithdrawing;
 	const buttonDisabled = isContributeMode
-		? !amount || amount < campaign.minContribution || isLoading
-		: !amount || amount <= 0 || amount > availableBalance || isLoading;
+		? !amount ||
+		  (amount < campaign.minContribution &&
+				availableBalance < campaign.minContribution) ||
+		  isLoading
+		: !amount ||
+		  amount <= 0 ||
+		  amount > availableBalance ||
+		  (availableBalance - (amount || 0) > 0 &&
+				availableBalance - (amount || 0) < campaign.minContribution) ||
+		  isLoading;
 
 	// Unified transaction execution
 	async function handleSubmit() {
@@ -70,8 +82,14 @@ export function ContributeWithdraw({
 				toast.error('You do not have enough SUI to contribute');
 				return;
 			}
-			if (amount < campaign.minContribution) {
-				toast.error('Amount must be greater than minimum contribution');
+			// Allow contributions < minContribution if user already has sufficient balance
+			if (
+				amount < campaign.minContribution &&
+				availableBalance < campaign.minContribution
+			) {
+				toast.error(
+					`Amount must be at least ${campaign.minContribution} SUI for new contributors`
+				);
 				return;
 			}
 			if (amount > remainingAmount) {
@@ -85,6 +103,7 @@ export function ContributeWithdraw({
 				minContribution: campaign.minContribution,
 				remainingAmount,
 				balance,
+				userBalance: availableBalance,
 			});
 		} else {
 			if (amount <= 0) {
@@ -93,6 +112,14 @@ export function ContributeWithdraw({
 			}
 			if (amount > availableBalance) {
 				toast.error(`Cannot withdraw more than ${availableBalance} SUI`);
+				return;
+			}
+			// Prevent partial withdrawals that would leave insufficient balance
+			const remainingBalance = availableBalance - amount;
+			if (remainingBalance > 0 && remainingBalance < campaign.minContribution) {
+				toast.error(
+					`Cannot withdraw this amount. Remaining balance would be ${remainingBalance} SUI, which is below the minimum contribution of ${campaign.minContribution} SUI`
+				);
 				return;
 			}
 
@@ -127,7 +154,7 @@ export function ContributeWithdraw({
 	};
 
 	const getDialogTitle = () => {
-		return isContributeMode 
+		return isContributeMode
 			? `Contribute to ${campaign.nft.name}`
 			: `Withdraw from ${campaign.nft.name}`;
 	};
@@ -160,16 +187,16 @@ export function ContributeWithdraw({
 					variant={isContributeMode ? 'default' : 'outline'}
 					className='w-full text-base'
 					size={isContributeMode ? 'default' : 'lg'}
-					disabled={!isContributeMode && (availableBalance <= 0 || !userAddress)}>
+					disabled={
+						!isContributeMode && (availableBalance <= 0 || !userAddress)
+					}>
 					{getButtonText()}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
 					<DialogTitle>{getDialogTitle()}</DialogTitle>
-					<DialogDescription>
-						{getDialogDescription()}
-					</DialogDescription>
+					<DialogDescription>{getDialogDescription()}</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleFormSubmit}>
 					<div className='grid gap-1'>
@@ -182,7 +209,11 @@ export function ContributeWithdraw({
 								step='any'
 								placeholder={isContributeMode ? '' : 'Enter amount'}
 								value={amount ?? ''}
-								onChange={(e) => setAmount(e.target.value === '' ? null : Number(e.target.value))}
+								onChange={(e) =>
+									setAmount(
+										e.target.value === '' ? null : Number(e.target.value)
+									)
+								}
 								className={isContributeMode ? '' : 'flex-1'}
 							/>
 							{!isContributeMode && (
@@ -214,9 +245,7 @@ export function ContributeWithdraw({
 								Cancel
 							</Button>
 						</DialogClose>
-						<Button
-							type='submit'
-							disabled={buttonDisabled}>
+						<Button type='submit' disabled={buttonDisabled}>
 							{isLoading ? (
 								<>
 									<Loader className='size-4 animate-spin mr-2' />
@@ -232,4 +261,3 @@ export function ContributeWithdraw({
 		</Dialog>
 	);
 }
-

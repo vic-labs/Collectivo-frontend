@@ -1,15 +1,11 @@
-import { Campaign } from '@collectivo/shared-types';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-	formatAddress,
-	formatNumberToHumanReadable,
-	formatSuiAmount,
-} from '@/lib/app-utils';
+import { formatAddress, formatNumberToHumanReadable } from '@/lib/app-utils';
+import { Campaign } from '@collectivo/shared-types';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { User } from 'lucide-react';
 import { RankBadge } from '../rank-badge';
 import { ViewAddressLink } from '../view-tx-link';
-import { User } from 'lucide-react';
 
 export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;

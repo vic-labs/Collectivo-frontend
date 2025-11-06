@@ -29,14 +29,16 @@ export function useContributeToCampaign(campaignId: string) {
 		minContribution: number;
 		remainingAmount: number;
 		balance?: number;
+		userBalance?: number;
 	}) => {
 		if (!currentAccount) {
 			throw new Error('Please connect your wallet to contribute');
 		}
 
 		// Validation
-		if (!params.amount || params.amount < params.minContribution) {
-			throw new Error(`Amount must be greater than minimum contribution of ${params.minContribution} SUI`);
+		// Allow contributions < minContribution if user already has sufficient balance
+		if (!params.amount || (params.amount < params.minContribution && (!params.userBalance || params.userBalance < params.minContribution))) {
+			throw new Error(`Amount must be at least ${params.minContribution} SUI for new contributors`);
 		}
 
 		if (params.balance && params.amount > params.balance) {
@@ -124,6 +126,7 @@ export function useContributeToCampaign(campaignId: string) {
 		minContribution: number;
 		remainingAmount: number;
 		balance?: number;
+		userBalance?: number;
 	}) => {
 		setIsContributing(true);
 
