@@ -1,6 +1,6 @@
 // Shared types for frontend application
 
-import { Campaign, Contribution, Proposal, Vote, Withdrawal } from '@collectivo/shared-types';
+import { Campaign, CampaignWithContributors, Contribution, DbNft, Proposal, Vote, Withdrawal } from '@collectivo/shared-types';
 
 // Campaign related types
 declare global {
@@ -15,20 +15,7 @@ declare global {
 		proposals: ProposalWithVotes[];
 	};
 
-	type UserCampaign = {
-		id: string;
-		creator: string;
-		nft: any;
-		description: string;
-		target: string;
-		suiRaised: string;
-		minContribution: string;
-		status: 'Active' | 'Completed';
-		totalContributors: number;
-		createdAt: Date;
-		completedAt: Date | null;
-		deletedAt: Date | null;
-		walletAddress: string | null;
+	type UserCampaign = CampaignWithContributors & {
 		contributions: Contribution[];
 		withdrawals: Withdrawal[];
 		proposals: Proposal[];

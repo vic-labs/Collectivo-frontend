@@ -11,30 +11,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-	calculateDepositWithFee,
 	formatNumberToHumanReadable,
 	mistToSui,
-	suiToMist,
 } from '@/lib/app-utils';
 import { getNftDataQueryOptions } from '@/utils/nft';
-import {
-	useCurrentAccount,
-	useSignAndExecuteTransaction,
-	useSuiClient,
-} from '@mysten/dapp-kit';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Loader, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CustomConnectButton } from '../custom-connect-button';
 import { RankBadge } from '../rank-badge';
 import { useAccountBalance } from '@/lib/hooks/useAccountBalance';
-import * as campaignModule from '@/contract-sdk/collectivo/campaign';
-import { Transaction } from '@mysten/sui/transactions';
-import { NewCampaign } from '@collectivo/shared-types';
-import { useRouter } from '@tanstack/react-router';
-import { createEmptyCampaignCache } from '@/utils/campaigns';
 import { cn } from '@/lib/utils';
+import { useCreateCampaign } from '@/lib/hooks/campaigns/useCreateCampaign';
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 
@@ -47,10 +37,7 @@ type CustomField = {
 export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNavbar?: boolean; triggerOnly?: boolean }) {
 	const [nftId, setNftId] = useState('');
 	const account = useCurrentAccount();
-	const suiClient = useSuiClient();
-	const queryClient = useQueryClient();
 	const { data: balance } = useAccountBalance();
-	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
 	const [step, setStep] = useState<'select-nft' | 'create-campaign'>(
 		'select-nft' as const
@@ -67,10 +54,7 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 		isSuccess: isSuccessNftData,
 	} = useQuery(getNftDataQueryOptions(nftId));
 
-	const {
-		mutateAsync: signAndExecuteTransaction,
-		isPending: isSigningTransaction,
-	} = useSignAndExecuteTransaction();
+	const { createCampaign, isCreating } = useCreateCampaign();
 
 	useEffect(() => {
 		if (isSuccessNftData) {
@@ -107,146 +91,31 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 			return;
 		}
 
-		if (minContribution && creatorContribution) {
-			if (creatorContribution < minContribution) {
-				toast.error(
-					'Your contribution amount cannot be less than the minimum contribution',
-					{
-						descriptionClassName,
-					}
-				);
-				return;
-			}
-
-			if (balance && creatorContribution > balance) {
-				toast.error('You do not have enough SUI to contribute', {
-					descriptionClassName,
-				});
-				return;
-			}
-		}
-
-		if (nftData && account) {
-			const campaign: NewCampaign = {
-				id: '', // Will be set after transaction
-				creator: account.address,
-				description,
-				nft: nftData,
-				target: mistToSui(nftData?.listingPrice ?? 0),
-				suiRaised: creatorContribution,
-				minContribution,
-				status: 'Active',
-				createdAt: new Date(),
-			};
-
-			const tx = new Transaction();
-
-			const [creatorContributionCoin] = tx.splitCoins(tx.gas, [
-				calculateDepositWithFee(suiToMist(creatorContribution)),
-			]);
-
-			tx.add(
-				campaignModule.create({
-					arguments: {
-						name: nftData.name,
-						nftId: nftData.id,
-						imageUrl: nftData.imageUrl,
-						rank: nftData.rank,
-						nftType: nftData.type,
-						description: description,
-						target: nftData.listingPrice,
-						minContribution: suiToMist(minContribution),
-						contribution: creatorContributionCoin,
-					},
-				})
-			);
-
-			toast.promise(
-				async () => {
-					const testResults = await suiClient.devInspectTransactionBlock({
-						sender: account.address,
-						transactionBlock: tx,
-					});
-
-					if (testResults.effects?.status?.status !== 'success') {
-						throw new Error(
-							testResults.effects?.status?.error || 'Failed to create campaign'
-						);
-					}
-
-					const result = await signAndExecuteTransaction({
-						transaction: tx,
-					});
-
-					// Wait for transaction finality to get events
-					const finalResult = await suiClient.waitForTransaction({
-						digest: result.digest,
-						options: {
-							showEffects: true,
-							showEvents: true,
-						},
-					});
-
-					// Extract campaign ID from NewCampaignEvent
-					const newCampaignEvent = finalResult.events?.find((event) =>
-						event.type.includes('NewCampaignEvent')
-					);
-
-					const campaignId = (newCampaignEvent?.parsedJson as any)
-						?.campaign_id as string;
-
-					if (!campaignId) {
-						throw new Error(
-							'Could not extract campaign ID from transaction events'
-						);
-					}
-
-					// Update cache with campaign ID
-					const campaignWithId = { ...campaign, id: campaignId };
-					queryClient.setQueryData(
-						['campaign', campaignId],
-						createEmptyCampaignCache({
-							campaign: campaignWithId,
-							txHash: result.digest,
-						})
-					);
-
-					queryClient.invalidateQueries({
-						queryKey: ['account-balance', account?.address],
-					});
-
-					return { digest: result.digest, campaignId };
-				},
+		if (creatorContribution < minContribution) {
+			toast.error(
+				'Your contribution amount cannot be less than the minimum contribution',
 				{
-					loading: 'Creating campaign...',
-					success: (data) => {
-						console.log('success', data);
-						resetForm();
-
-						router.navigate({
-							to: '/campaigns/$campaignId',
-							params: { campaignId: data.campaignId },
-						});
-
-						return {
-							message: 'Campaign created successfully',
-						};
-					},
-					error: (error) => {
-						if (error instanceof Error) {
-							return {
-								message: error.message,
-							};
-						}
-
-						return {
-							message: 'Failed to create campaign',
-							description: 'If this error persists, please contact support',
-							descriptionClassName,
-						};
-					},
+					descriptionClassName,
 				}
 			);
+			return;
+		}
+
+		if (balance && creatorContribution > balance) {
+			toast.error('You do not have enough SUI to contribute', {
+				descriptionClassName,
+			});
+			return;
+		}
+
+		if (nftData) {
+			await createCampaign({
+				description,
+				minContribution,
+				creatorContribution,
+				nftData,
+			});
+			resetForm();
 		}
 	}
 
@@ -428,9 +297,8 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 							{step === 'create-campaign' && (
 								<Button
 									type='submit'
-									// onClick={(e) => handleSubmit(e)}
-									disabled={isSigningTransaction}>
-									{isSigningTransaction ? (
+									disabled={isCreating}>
+									{isCreating ? (
 										<>
 											<Loader className='size-4 animate-spin' /> Creating
 											Campaign...

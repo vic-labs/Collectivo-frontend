@@ -12,22 +12,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
-import {
-	useSignAndExecuteTransaction,
-	useSuiClient,
-	useCurrentAccount,
-} from '@mysten/dapp-kit';
-import { Transaction } from '@mysten/sui/transactions';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import * as campaignModule from '@/contract-sdk/collectivo/campaign';
-import { MIST_PER_SUI } from '@mysten/sui/utils';
-import { useQueryClient } from '@tanstack/react-query';
-import { updateCampaignQueryData } from '@/utils/campaigns';
 import { Loader } from 'lucide-react';
-import { formatSuiAmount, calculateDepositWithFee } from '@/lib/app-utils';
 import { useAccountBalance } from '@/lib/hooks/useAccountBalance';
-import { ViewTxLink } from '../view-tx-link';
+import { useContributeToCampaign } from '@/lib/hooks/campaigns/useContributeToCampaign';
+import { useWithdrawFromCampaign } from '@/lib/hooks/campaigns/useWithdrawFromCampaign';
 
 type ContributeWithdrawProps = {
 	mode: 'contribute' | 'withdraw';
@@ -46,13 +36,10 @@ export function ContributeWithdraw({
 }: ContributeWithdrawProps) {
 	const [amount, setAmount] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
-	const client = useSuiClient();
-	const queryClient = useQueryClient();
-	const account = useCurrentAccount();
 	const { data: balance } = useAccountBalance();
 
-	const { mutateAsync: signAndExecuteTransaction, isPending } =
-		useSignAndExecuteTransaction();
+	const { contributeToCampaign, isContributing } = useContributeToCampaign(campaign.id);
+	const { withdrawFromCampaign, isWithdrawing } = useWithdrawFromCampaign(campaign.id);
 
 	// Calculate values based on mode
 	const remainingAmount = campaign.target - campaign.suiRaised;
@@ -68,158 +55,55 @@ export function ContributeWithdraw({
 
 	// Mode-specific configurations
 	const isContributeMode = mode === 'contribute';
-	const isLoading = isPending;
-	const buttonDisabled = isContributeMode 
+	const isLoading = isContributeMode ? isContributing : isWithdrawing;
+	const buttonDisabled = isContributeMode
 		? !amount || amount < campaign.minContribution || isLoading
 		: !amount || amount <= 0 || amount > availableBalance || isLoading;
 
-	// Validation
-	function validateTransaction() {
+	// Unified transaction execution
+	async function handleSubmit() {
+		if (!amount) return;
+
+		// Validation
 		if (isContributeMode) {
-			if (balance && amount && amount > balance) {
+			if (balance && amount > balance) {
 				toast.error('You do not have enough SUI to contribute');
-				return false;
+				return;
 			}
-			if (!amount || amount < campaign.minContribution) {
+			if (amount < campaign.minContribution) {
 				toast.error('Amount must be greater than minimum contribution');
-				return false;
+				return;
 			}
 			if (amount > remainingAmount) {
 				toast.warning('You are contributing more than the remaining amount');
-				return false;
+				return;
 			}
+
+			await contributeToCampaign({
+				amount,
+				campaign,
+				minContribution: campaign.minContribution,
+				remainingAmount,
+				balance,
+			});
 		} else {
-			if (!amount || amount <= 0) {
+			if (amount <= 0) {
 				toast.error('Please enter a valid amount');
-				return false;
+				return;
 			}
 			if (amount > availableBalance) {
 				toast.error(`Cannot withdraw more than ${availableBalance} SUI`);
-				return false;
+				return;
 			}
-		}
-		return true;
-	}
 
-	// Build transaction
-	function buildTransaction() {
-		const tx = new Transaction();
-		
-		if (isContributeMode) {
-			const [coin] = tx.splitCoins(tx.gas, [
-				calculateDepositWithFee(getMist(amount!)),
-			]);
-			tx.add(
-				campaignModule.contribute({
-					arguments: {
-						campaign: campaign.id,
-						coin,
-					},
-				})
-			);
-		} else {
-			tx.add(
-				campaignModule.withdraw({
-					arguments: {
-						campaign: campaign.id,
-						amount: getMist(amount!),
-					},
-				})
-			);
-		}
-		
-		return tx;
-	}
-
-	// Update query data
-	function updateQueryData(result: { amount: number; digest: string }) {
-		if (isContributeMode) {
-			updateCampaignQueryData(queryClient, campaign.id, {
-				suiRaisedChange: result.amount,
-				newContribution: {
-					id: Date.now(),
-					amount: result.amount,
-					campaignId: campaign.id,
-					contributor: account?.address || '',
-					txDigest: result.digest,
-					contributedAt: new Date(),
-				},
-			});
-			queryClient.invalidateQueries({
-				queryKey: ['account-balance', account?.address],
-			});
-		} else {
-			updateCampaignQueryData(queryClient, campaign.id, {
-				suiRaisedChange: -result.amount,
-				newWithdrawal: {
-					id: Date.now(),
-					amount: result.amount,
-					campaignId: campaign.id,
-					contributor: userAddress || '',
-					txDigest: result.digest,
-					withdrawnAt: new Date(),
-					isFullWithdrawal: result.amount === availableBalance,
-				},
+			await withdrawFromCampaign({
+				amount,
+				availableBalance,
 			});
 		}
-	}
 
-	// Unified transaction execution
-	async function handleSubmit() {
-		if (!amount || !validateTransaction()) return;
-
-		const tx = buildTransaction();
-
-		toast.promise(
-			async () => {
-				const result = await signAndExecuteTransaction({
-					transaction: tx,
-				});
-
-				const finalResult = await client.waitForTransaction({
-					digest: result.digest,
-					options: {
-						showEffects: true,
-						showEvents: true,
-					},
-				});
-
-				if (finalResult.effects?.status?.status !== 'success') {
-					throw new Error(
-						finalResult.effects?.status?.error || 'Transaction failed'
-					);
-				}
-
-				updateQueryData({ amount, digest: result.digest });
-
-				return {
-					amount,
-					digest: result.digest,
-				};
-			},
-			{
-				loading: `${isContributeMode ? 'Contributing' : 'Withdrawing'} ${formatSuiAmount(amount)} SUI...`,
-				success: (data) => {
-					setIsOpen(false);
-					setAmount(null);
-
-					return {
-						message: `You just ${isContributeMode ? 'contributed' : 'withdrew'} ${formatSuiAmount(data.amount)} SUI`,
-						action: <ViewTxLink txHash={data.digest} />,
-					};
-				},
-				error: (error) => {
-					if (error instanceof Error) {
-						return {
-							message: error.message,
-						};
-					}
-					return {
-						message: `Failed to ${isContributeMode ? 'contribute' : 'withdraw'}. Please try again.`,
-					};
-				},
-			}
-		);
+		setIsOpen(false);
+		setAmount(null);
 	}
 
 	const handleFormSubmit = (e: React.FormEvent) => {
@@ -349,7 +233,3 @@ export function ContributeWithdraw({
 	);
 }
 
-function getMist(amount: number) {
-	const mistAmount = amount * Number(MIST_PER_SUI);
-	return BigInt(Math.floor(mistAmount));
-}

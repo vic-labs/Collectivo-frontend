@@ -39,7 +39,7 @@ function RouteComponent() {
 					{showProposals && (
 						<Proposals
 							campaignId={campaign.id}
-							nftPurchased={campaign.nft?.isPurchased || false}
+							nftPurchased={campaign.nft.isPurchased}
 							proposals={proposals}
 							showForCompleted={showProposals}
 						/>
