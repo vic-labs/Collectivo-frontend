@@ -1,5 +1,7 @@
 # AGENTS.md
 
+**IMPORTANT**: Do not commit changes without explicit user permission. Always ask before creating commits.
+
 ## Build/Lint/Test Commands
 - **Build**: `bun run build`
 - **Dev server**: `bun run dev`

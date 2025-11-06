@@ -10,10 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-	formatNumberToHumanReadable,
-	mistToSui,
-} from '@/lib/app-utils';
+import { formatNumberToHumanReadable, mistToSui } from '@/lib/app-utils';
 import { getNftDataQueryOptions } from '@/utils/nft';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { useQuery } from '@tanstack/react-query';
@@ -34,7 +31,13 @@ type CustomField = {
 	creatorContribution: number | null;
 };
 
-export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNavbar?: boolean; triggerOnly?: boolean }) {
+export function CreateCampaign({
+	isNavbar = false,
+	triggerOnly = false,
+}: {
+	isNavbar?: boolean;
+	triggerOnly?: boolean;
+}) {
 	const [nftId, setNftId] = useState('');
 	const account = useCurrentAccount();
 	const { data: balance } = useAccountBalance();
@@ -71,6 +74,11 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 			creatorContribution: null,
 		});
 		setIsOpen(false);
+	}
+
+	function back() {
+		setStep('select-nft');
+		setNftId('');
 	}
 
 	if (isErrorNftData) {
@@ -119,8 +127,13 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 		}
 	}
 
-  const triggerButton = (
-		<Button className={cn('text-base', isNavbar && 'w-full', triggerOnly && 'w-full justify-start')}>
+	const triggerButton = (
+		<Button
+			className={cn(
+				'text-base',
+				isNavbar && 'w-full',
+				triggerOnly && 'w-full justify-start'
+			)}>
 			<span className='lg:hidden'>
 				{!isNavbar ? 'Create' : 'Create Campaign'}
 			</span>{' '}
@@ -129,15 +142,13 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 		</Button>
 	);
 
-  if (triggerOnly) {
-    return triggerButton;
-  }
+	if (triggerOnly) {
+		return triggerButton;
+	}
 
-  return (
+	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger asChild>
-				{triggerButton}
-			</DialogTrigger>
+			<DialogTrigger asChild>{triggerButton}</DialogTrigger>
 			<DialogContent
 				className='sm:max-w-[450px]'
 				onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -174,7 +185,7 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 									<img
 										src={nftData?.imageUrl}
 										alt={nftData?.name}
-										className='size-35 rounded-lg border-primary border-2'
+										className='size-35 rounded-lg shadow-md'
 									/>
 									<div className='grid gap-5 w-full pt-1'>
 										<div className='flex items-center justify-between'>
@@ -275,10 +286,7 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 						<DialogFooter
 							className={step === 'select-nft' ? '' : 'justify-between!'}>
 							{step === 'create-campaign' && (
-								<Button
-									type='button'
-									onClick={() => setStep('select-nft')}
-									variant='outline'>
+								<Button type='button' onClick={back} variant='outline'>
 									<ArrowLeft /> Back
 								</Button>
 							)}
@@ -295,9 +303,7 @@ export function CreateCampaign({ isNavbar = false, triggerOnly = false }: { isNa
 								</Button>
 							)}
 							{step === 'create-campaign' && (
-								<Button
-									type='submit'
-									disabled={isCreating}>
+								<Button type='submit' disabled={isCreating}>
 									{isCreating ? (
 										<>
 											<Loader className='size-4 animate-spin' /> Creating

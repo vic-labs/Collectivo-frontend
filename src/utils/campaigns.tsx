@@ -208,7 +208,7 @@ export function createEmptyCampaignCache({
 				id: Date.now(),
 				campaignId: campaign.id,
 				contributor: campaign.creator,
-				amount: 0,
+				amount: campaign.suiRaised,
 				contributedAt: new Date(),
 				txDigest: txHash,
 			},
