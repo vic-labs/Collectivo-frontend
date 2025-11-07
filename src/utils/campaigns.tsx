@@ -105,10 +105,17 @@ export const updateCampaignQueryData = (
 		// Update campaign suiRaised if change provided
 		if (updates.suiRaisedChange !== undefined) {
 			console.log('Updating suiRaised', updates.suiRaisedChange);
+			const newSuiRaised = oldData.campaign.suiRaised + updates.suiRaisedChange;
 			updatedData.campaign = {
 				...oldData.campaign,
-				suiRaised: oldData.campaign.suiRaised + updates.suiRaisedChange,
+				suiRaised: newSuiRaised,
 			};
+
+			// Check if campaign is now completed
+			if (newSuiRaised >= oldData.campaign.target && oldData.campaign.status === 'Active') {
+				updatedData.campaign.status = 'Completed';
+				updatedData.campaign.completedAt = new Date();
+			}
 		}
 
 		// Add new contribution if provided
