@@ -23,7 +23,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 
-import { Navbar } from '@/components/navbar';
+import { Navbar } from '@/components/navbar.tsx';
 import { networkConfig } from '@/lib/sui-network-config';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { SuiClient } from '@mysten/sui/client';
