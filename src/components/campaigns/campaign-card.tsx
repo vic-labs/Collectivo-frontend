@@ -26,7 +26,7 @@ export const CampaignCard = ({
 						<img
 							loading='lazy'
 							decoding='async'
-							// fetchPriority='low'
+							fetchPriority='low'
 							src={campaign.nft.imageUrl}
 							alt={campaign.nft.name}
 							className='w-full object-cover'
