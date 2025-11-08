@@ -23,7 +23,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 
-// import { Navbar } from '@/components/navbar';
+import { Navbar } from '@/components/navbar';
 import { networkConfig } from '@/lib/sui-network-config';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { SuiClient } from '@mysten/sui/client';
@@ -79,7 +79,7 @@ function RootComponent() {
 				<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
 					<RootDocument>
 						<NuqsAdapter>
-							{/* <Navbar /> */}
+							<Navbar />
 							<Outlet />
 							<Toaster />
 						</NuqsAdapter>
