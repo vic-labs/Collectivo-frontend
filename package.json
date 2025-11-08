@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite dev --port 3000 --host",
     "start": "vite --port 3000",
-    "build": "vite build --debug",
+    "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
     "codegen": "sui-ts-codegen generate"
