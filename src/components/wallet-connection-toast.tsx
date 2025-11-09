@@ -1,6 +1,7 @@
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { formatAddress } from '@/lib/app-utils';
 
 const STORAGE_KEY = 'sui-dapp-kit:wallet-connection-info';
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
@@ -10,28 +11,32 @@ export function WalletConnectionToast() {
 	const hasShownToastRef = useRef(false);
 
 	useEffect(() => {
-		if (hasShownToastRef.current) return;
+		// Early return if toast already shown or no account
+		if (hasShownToastRef.current || !account?.address) return;
 
 		try {
 			const storedConnection = localStorage.getItem(STORAGE_KEY);
 			const storedData = storedConnection ? JSON.parse(storedConnection) : null;
 
-			const wasPreviouslyConnected = storedData?.state?.lastConnectedAccountAddress;
-			const isCurrentlyConnected = account?.address;
+			const wasPreviouslyConnected =
+				storedData?.state?.lastConnectedAccountAddress;
 
 			// Only show toast on genuine first-time connections
-			if (!wasPreviouslyConnected && isCurrentlyConnected && !hasShownToastRef.current) {
+			if (!wasPreviouslyConnected) {
 				toast.success('Wallet connected successfully', {
-					description: `Connected to ${account.address.slice(0, 6)}...${account.address.slice(-4)}`,
+					description: `Connected to ${formatAddress(account.address)}`,
 					descriptionClassName,
 				});
 				hasShownToastRef.current = true;
 			}
 		} catch (error) {
 			// Silently handle localStorage errors
-			console.warn('Wallet connection toast: localStorage access failed', error);
+			console.warn(
+				'Wallet connection toast: localStorage access failed',
+				error
+			);
 		}
 	}, [account?.address]);
 
-	return null; // Invisible component
+	return null;
 }

@@ -83,8 +83,13 @@ export function generateCampaignId(): string {
 
 export function formatNumberToHumanReadable(number?: number): string {
     if (!number) return '0';
-    return number.toLocaleString('en-US', {
+
+    // Format with up to 2 decimal places
+    const formatted = number.toLocaleString('en-US', {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        maximumFractionDigits: 2,
     });
+
+    // Strip unnecessary trailing zeros and decimal point
+    return formatted.replace(/\.?0+$/, '');
 }
