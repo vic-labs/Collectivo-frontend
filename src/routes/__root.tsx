@@ -15,6 +15,7 @@ import '@fontsource/montserrat/900.css';
 import '@mysten/dapp-kit/dist/index.css';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import {
+	ClientOnly,
 	HeadContent,
 	Outlet,
 	Scripts,
@@ -25,6 +26,7 @@ import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 
 import { Navbar } from '@/components/navbar';
 import { networkConfig } from '@/lib/sui-network-config';
+import { WalletConnectionToast } from '@/components/wallet-connection-toast';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { SuiClient } from '@mysten/sui/client';
 import { QueryClient } from '@tanstack/react-query';
@@ -76,6 +78,9 @@ function RootComponent() {
 				});
 			}}>
 			<WalletProvider autoConnect>
+				<ClientOnly>
+					<WalletConnectionToast />
+				</ClientOnly>
 				<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
 					<RootDocument>
 						<NuqsAdapter>
