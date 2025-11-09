@@ -74,7 +74,7 @@ export function useCreateCampaign() {
 					rank: params.nftData.rank,
 					nftType: params.nftData.type,
 					description: params.description,
-					target: params.nftData.listingPrice + suiToMist(0.1),
+					target: BigInt(params.nftData.listingPrice) + suiToMist(0.1),
 					minContribution: suiToMist(params.minContribution),
 					contribution: creatorContributionCoin,
 				},
