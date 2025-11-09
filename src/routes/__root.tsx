@@ -1,6 +1,5 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import { WalletConnectionToast } from '@/components/wallet-connection-toast';
 
 import '@fontsource/albert-sans/400.css';
 import '@fontsource/albert-sans/500.css';
@@ -77,7 +76,6 @@ function RootComponent() {
 				});
 			}}>
 			<WalletProvider autoConnect>
-				<WalletConnectionToast />
 				<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
 					<RootDocument>
 						<NuqsAdapter>
