@@ -1,36 +1,57 @@
-import { useCurrentAccount } from '@mysten/dapp-kit';
-import { useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 import { formatAddress } from '@/lib/app-utils';
+import { useCurrentAccount, useCurrentWallet } from '@mysten/dapp-kit';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 
+type walletConnectState = {
+	state: {
+		lastConnectedWalletName: string | null;
+		lastConnectedAccountAddress: string | null;
+	};
+	version: number;
+};
+
 export function WalletConnectionToast() {
-	const account = useCurrentAccount();
-	const previousAccountRef = useRef<string | null>(null);
-	const hasInitializedRef = useRef(false);
+	const { isDisconnected, isConnected } = useCurrentWallet();
+	const currentAccount = useCurrentAccount();
+	const [initialState, setInitialState] = useState<walletConnectState | null>(
+		getWalletConnectionState()
+	);
+
+	const initialStateExists = useMemo(
+		() => !!initialState?.state.lastConnectedAccountAddress,
+		[initialState]
+	);
+
+	// console.log({ currentState });
 
 	useEffect(() => {
-		const currentAddress = account?.address || null;
-		const previousAddress = previousAccountRef.current;
-
-		// Skip the first effect run (initial mount) to avoid auto-connect toasts
-		if (!hasInitializedRef.current) {
-			hasInitializedRef.current = true;
-			previousAccountRef.current = currentAddress;
-			return;
-		}
-
-		// Show toast when transitioning from no account to having an account
-		if (!previousAddress && currentAddress) {
+		if (!initialStateExists && isConnected) {
 			toast.success('Wallet connected successfully', {
-				description: `Connected to ${formatAddress(currentAddress)}`,
+				description: `Connected to ${formatAddress(
+					currentAccount?.address ?? ''
+				)}`,
 				descriptionClassName,
 			});
 		}
 
-		previousAccountRef.current = currentAddress;
-	}, [account?.address]);
+		if (isDisconnected) {
+			setInitialState(getWalletConnectionState());
+		}
+	}, [isConnected]);
 
+	return null;
+}
+
+function getWalletConnectionState() {
+	const key = 'sui-dapp-kit:wallet-connection-info';
+	if (typeof window !== 'undefined') {
+		const state = window.localStorage.getItem(key) as string;
+		if (state) {
+			return JSON.parse(state) as walletConnectState;
+		}
+	}
 	return null;
 }
