@@ -19,6 +19,8 @@ export async function getTransferPolicyId({ nftType }: { nftType: string }): Pro
             return policyId || null;
         }
 
+        console.log("❌ Transfer policy id not found");
+
 
         return null;
     } catch (e) {
@@ -82,6 +84,8 @@ export async function getNativeKioskListingPrice({
         if (royaltyConfig.data) {
             const { amount_bp, min_amount } = (royaltyConfig.data.content as any).fields.value.fields;
 
+            console.log({ amount_bp })
+
             royaltyMist = Math.max(
                 Math.floor((listingMist * Number(amount_bp)) / 10_000),
                 Number(min_amount)
@@ -128,17 +132,20 @@ export async function getNativeKioskListingPrice({
 async function getKioskId(nftId: string) {
     const dynmicObjectWrapperRes = await suiMainnetClient.getObject({ id: nftId, options: { showOwner: true } });
     if (!dynmicObjectWrapperRes.data) {
+        console.log("❌ Dynamic object wrapper not found");
         return undefined;
     }
     const owner = (dynmicObjectWrapperRes.data.owner as any)?.ObjectOwner;
 
     if (!owner) {
+        console.log("❌ Owner not found");
         return undefined;
     }
 
     const fieldObjectRes = await suiMainnetClient.getObject({ id: owner, options: { showOwner: true } });
     const kioskId = (fieldObjectRes.data?.owner as any)?.ObjectOwner;
     if (!kioskId) {
+        console.log("❌ Kiosk id not found");
         return undefined;
     }
     return kioskId;

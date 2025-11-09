@@ -6,7 +6,9 @@ import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
-const nftNotListedError = new Error('NFT is not listed on the market');
+export const NFT_NOT_LISTED_ERROR = new Error(
+	'NFT is not listed on the market'
+);
 
 export const getNftData = createServerFn({ method: 'GET' })
 	.inputValidator(z.object({ id: z.string() }))
@@ -15,6 +17,9 @@ export const getNftData = createServerFn({ method: 'GET' })
 			const suiNftResponse = await fetch(`${SUI_NFT_API(data.id)}`);
 
 			if (!suiNftResponse.ok) {
+				if (suiNftResponse.status === 404) {
+					throw NFT_NOT_LISTED_ERROR;
+				}
 				throw new Error('Failed to fetch NFT data');
 			}
 
@@ -26,7 +31,7 @@ export const getNftData = createServerFn({ method: 'GET' })
 			});
 
 			if (!listingPrice) {
-				throw nftNotListedError;
+				throw NFT_NOT_LISTED_ERROR;
 			}
 
 			return {
@@ -46,7 +51,7 @@ export const getNftDataQueryOptions = (id: string) => {
 		retry(failureCount, error) {
 			if (
 				error instanceof Error &&
-				error.message.includes(nftNotListedError.message)
+				error.message.includes(NFT_NOT_LISTED_ERROR.message)
 			) {
 				return false;
 			}

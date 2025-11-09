@@ -22,6 +22,7 @@ import { RankBadge } from '../rank-badge';
 import { useAccountBalance } from '@/lib/hooks/useAccountBalance';
 import { cn } from '@/lib/utils';
 import { useCreateCampaign } from '@/lib/hooks/campaigns/useCreateCampaign';
+import { NFT_NOT_LISTED_ERROR } from '@/utils/nft';
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 
@@ -54,6 +55,7 @@ export function CreateCampaign({
 		data: nftData,
 		isLoading: isFetchingNftData,
 		isError: isErrorNftData,
+		error: errorNftData,
 		isSuccess: isSuccessNftData,
 	} = useQuery(getNftDataQueryOptions(nftId));
 
@@ -83,7 +85,10 @@ export function CreateCampaign({
 
 	if (isErrorNftData) {
 		toast.error('Failed to fetch NFT data', {
-			description: 'NFT is probably not listed on the market',
+			description:
+				errorNftData === NFT_NOT_LISTED_ERROR
+					? 'NFT is probably not listed on the market or not indexed yet'
+					: 'Please try again later',
 			descriptionClassName,
 		});
 	}
