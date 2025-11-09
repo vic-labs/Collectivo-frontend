@@ -210,10 +210,11 @@ export function CreateCampaign({
 											<p className='text-sm! flex items-center gap-1 font-bold'>
 												<img src='/sui.svg' alt='sui' className='size-3' />
 												{formatNumberToHumanReadable(
-													mistToSui(nftData?.listingPrice ?? 0)
+													mistToSui(nftData?.listingPrice ?? 0) + 0.1
 												)}{' '}
 											</p>
 										</div>
+										<p className='text-xs text-muted-foreground'>(+0.1 SUI for gas)</p>
 									</div>
 								</div>
 

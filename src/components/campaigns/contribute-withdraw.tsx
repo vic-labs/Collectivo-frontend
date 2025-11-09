@@ -138,8 +138,12 @@ export function ContributeWithdraw({
 		handleSubmit();
 	};
 
-	const handleMaxClick = () => {
-		setAmount(availableBalance);
+  const handleMaxClick = () => {
+		if (isContributeMode) {
+			setAmount(remainingAmount);
+		} else {
+			setAmount(availableBalance);
+		}
 	};
 
 	// Button text and state
@@ -199,9 +203,9 @@ export function ContributeWithdraw({
 					<DialogDescription>{getDialogDescription()}</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleFormSubmit}>
-					<div className='grid gap-1'>
+ 					<div className='grid gap-1'>
 						<Label htmlFor='amount'>Amount</Label>
-						<div className={isContributeMode ? '' : 'flex gap-2'}>
+						<div className='flex gap-2'>
 							<Input
 								id='amount'
 								name='amount'
@@ -214,17 +218,15 @@ export function ContributeWithdraw({
 										e.target.value === '' ? null : Number(e.target.value)
 									)
 								}
-								className={isContributeMode ? '' : 'flex-1'}
+								className='flex-1'
 							/>
-							{!isContributeMode && (
-								<Button
-									type='button'
-									variant='secondary'
-									onClick={handleMaxClick}
-									className='shrink-0'>
-									Max
-								</Button>
-							)}
+							<Button
+								type='button'
+								variant='secondary'
+								onClick={handleMaxClick}
+								className='shrink-0'>
+								Max
+							</Button>
 						</div>
 						{isContributeMode ? (
 							<p className='text-xs text-right text-muted-foreground'>
