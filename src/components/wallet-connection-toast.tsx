@@ -3,39 +3,33 @@ import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { formatAddress } from '@/lib/app-utils';
 
-const STORAGE_KEY = 'sui-dapp-kit:wallet-connection-info';
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 
 export function WalletConnectionToast() {
 	const account = useCurrentAccount();
-	const hasShownToastRef = useRef(false);
+	const previousAccountRef = useRef<string | null>(null);
+	const hasInitializedRef = useRef(false);
 
 	useEffect(() => {
-		// Early return if toast already shown or no account
-		if (hasShownToastRef.current || !account?.address) return;
+		const currentAddress = account?.address || null;
+		const previousAddress = previousAccountRef.current;
 
-		try {
-			const storedConnection = localStorage.getItem(STORAGE_KEY);
-			const storedData = storedConnection ? JSON.parse(storedConnection) : null;
-
-			const wasPreviouslyConnected =
-				storedData?.state?.lastConnectedAccountAddress;
-
-			// Only show toast on genuine first-time connections
-			if (!wasPreviouslyConnected) {
-				toast.success('Wallet connected successfully', {
-					description: `Connected to ${formatAddress(account.address)}`,
-					descriptionClassName,
-				});
-				hasShownToastRef.current = true;
-			}
-		} catch (error) {
-			// Silently handle localStorage errors
-			console.warn(
-				'Wallet connection toast: localStorage access failed',
-				error
-			);
+		// Skip the first effect run (initial mount) to avoid auto-connect toasts
+		if (!hasInitializedRef.current) {
+			hasInitializedRef.current = true;
+			previousAccountRef.current = currentAddress;
+			return;
 		}
+
+		// Show toast when transitioning from no account to having an account
+		if (!previousAddress && currentAddress) {
+			toast.success('Wallet connected successfully', {
+				description: `Connected to ${formatAddress(currentAddress)}`,
+				descriptionClassName,
+			});
+		}
+
+		previousAccountRef.current = currentAddress;
 	}, [account?.address]);
 
 	return null;
