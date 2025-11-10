@@ -75,7 +75,8 @@ export const NFTActionError = new MoveEnum({ name: `${$moduleName}::NFTActionErr
     } });
 export const NFTActionErrorEvent = new MoveStruct({ name: `${$moduleName}::NFTActionErrorEvent`, fields: {
         campaign_id: bcs.Address,
-        error_type: NFTActionError
+        error_type: NFTActionError,
+        error_message: bcs.string()
     } });
 export const WalletAddressSetEvent = new MoveStruct({ name: `${$moduleName}::WalletAddressSetEvent`, fields: {
         campaign_id: bcs.Address,
@@ -208,7 +209,7 @@ export function withdraw(options: WithdrawOptions) {
 }
 export interface SetNftStatusArguments {
     campaign: RawTransactionArgument<string>;
-    status: RawTransactionArgument<string>;
+    statusCode: RawTransactionArgument<number>;
     Cap: RawTransactionArgument<string>;
     nftId: RawTransactionArgument<string>;
     imageUrl: RawTransactionArgument<string>;
@@ -220,7 +221,7 @@ export interface SetNftStatusOptions {
     package?: string;
     arguments: SetNftStatusArguments | [
         campaign: RawTransactionArgument<string>,
-        status: RawTransactionArgument<string>,
+        statusCode: RawTransactionArgument<number>,
         Cap: RawTransactionArgument<string>,
         nftId: RawTransactionArgument<string>,
         imageUrl: RawTransactionArgument<string>,
@@ -233,7 +234,7 @@ export function setNftStatus(options: SetNftStatusOptions) {
     const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
-        `${packageAddress}::campaign::NFTStatus`,
+        'u8',
         `${packageAddress}::collectivo::AdminCap`,
         '0x0000000000000000000000000000000000000000000000000000000000000002::object::ID',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
@@ -241,7 +242,7 @@ export function setNftStatus(options: SetNftStatusOptions) {
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         '0x0000000000000000000000000000000000000000000000000000000000000001::string::String'
     ] satisfies string[];
-    const parameterNames = ["campaign", "status", "Cap", "nftId", "imageUrl", "rank", "name", "nftType"];
+    const parameterNames = ["campaign", "statusCode", "Cap", "nftId", "imageUrl", "rank", "name", "nftType"];
     return (tx: Transaction) => tx.moveCall({
         package: packageAddress,
         module: 'campaign',
@@ -251,14 +252,16 @@ export function setNftStatus(options: SetNftStatusOptions) {
 }
 export interface SetNftStatusErrorArguments {
     campaign: RawTransactionArgument<string>;
-    errorType: RawTransactionArgument<string>;
+    errorTypeCode: RawTransactionArgument<number>;
+    errorMessage: RawTransactionArgument<string>;
     Cap: RawTransactionArgument<string>;
 }
 export interface SetNftStatusErrorOptions {
     package?: string;
     arguments: SetNftStatusErrorArguments | [
         campaign: RawTransactionArgument<string>,
-        errorType: RawTransactionArgument<string>,
+        errorTypeCode: RawTransactionArgument<number>,
+        errorMessage: RawTransactionArgument<string>,
         Cap: RawTransactionArgument<string>
     ];
 }
@@ -266,10 +269,11 @@ export function setNftStatusError(options: SetNftStatusErrorOptions) {
     const packageAddress = options.package ?? '@local-pkg/collectivo';
     const argumentsTypes = [
         `${packageAddress}::campaign::Campaign`,
-        `${packageAddress}::campaign::NFTActionError`,
+        'u8',
+        '0x0000000000000000000000000000000000000000000000000000000000000001::string::String',
         `${packageAddress}::collectivo::AdminCap`
     ] satisfies string[];
-    const parameterNames = ["campaign", "errorType", "Cap"];
+    const parameterNames = ["campaign", "errorTypeCode", "errorMessage", "Cap"];
     return (tx: Transaction) => tx.moveCall({
         package: packageAddress,
         module: 'campaign',
@@ -572,6 +576,116 @@ export function id(options: IdOptions) {
         package: packageAddress,
         module: 'campaign',
         function: 'id',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
+export interface GetNftIdArguments {
+    self: RawTransactionArgument<string>;
+}
+export interface GetNftIdOptions {
+    package?: string;
+    arguments: GetNftIdArguments | [
+        self: RawTransactionArgument<string>
+    ];
+}
+export function getNftId(options: GetNftIdOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        `${packageAddress}::campaign::Campaign`
+    ] satisfies string[];
+    const parameterNames = ["self"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'campaign',
+        function: 'get_nft_id',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
+export interface GetNftImageUrlArguments {
+    self: RawTransactionArgument<string>;
+}
+export interface GetNftImageUrlOptions {
+    package?: string;
+    arguments: GetNftImageUrlArguments | [
+        self: RawTransactionArgument<string>
+    ];
+}
+export function getNftImageUrl(options: GetNftImageUrlOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        `${packageAddress}::campaign::Campaign`
+    ] satisfies string[];
+    const parameterNames = ["self"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'campaign',
+        function: 'get_nft_image_url',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
+export interface GetNftRankArguments {
+    self: RawTransactionArgument<string>;
+}
+export interface GetNftRankOptions {
+    package?: string;
+    arguments: GetNftRankArguments | [
+        self: RawTransactionArgument<string>
+    ];
+}
+export function getNftRank(options: GetNftRankOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        `${packageAddress}::campaign::Campaign`
+    ] satisfies string[];
+    const parameterNames = ["self"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'campaign',
+        function: 'get_nft_rank',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
+export interface GetNftNameArguments {
+    self: RawTransactionArgument<string>;
+}
+export interface GetNftNameOptions {
+    package?: string;
+    arguments: GetNftNameArguments | [
+        self: RawTransactionArgument<string>
+    ];
+}
+export function getNftName(options: GetNftNameOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        `${packageAddress}::campaign::Campaign`
+    ] satisfies string[];
+    const parameterNames = ["self"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'campaign',
+        function: 'get_nft_name',
+        arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
+    });
+}
+export interface GetNftTypeArguments {
+    self: RawTransactionArgument<string>;
+}
+export interface GetNftTypeOptions {
+    package?: string;
+    arguments: GetNftTypeArguments | [
+        self: RawTransactionArgument<string>
+    ];
+}
+export function getNftType(options: GetNftTypeOptions) {
+    const packageAddress = options.package ?? '@local-pkg/collectivo';
+    const argumentsTypes = [
+        `${packageAddress}::campaign::Campaign`
+    ] satisfies string[];
+    const parameterNames = ["self"];
+    return (tx: Transaction) => tx.moveCall({
+        package: packageAddress,
+        module: 'campaign',
+        function: 'get_nft_type',
         arguments: normalizeMoveArguments(options.arguments, argumentsTypes, parameterNames),
     });
 }

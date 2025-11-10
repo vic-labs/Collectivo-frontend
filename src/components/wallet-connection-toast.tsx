@@ -1,6 +1,6 @@
 import { formatAddress } from '@/lib/app-utils';
 import { useCurrentAccount, useCurrentWallet } from '@mysten/dapp-kit';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
@@ -24,8 +24,6 @@ export function WalletConnectionToast() {
 		() => !!initialState?.state.lastConnectedAccountAddress,
 		[initialState]
 	);
-
-	// console.log({ currentState });
 
 	useEffect(() => {
 		if (!initialStateExists && isConnected) {
