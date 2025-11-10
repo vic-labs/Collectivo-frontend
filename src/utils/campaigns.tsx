@@ -13,6 +13,8 @@ import { z } from 'zod';
 import { objectToQueryString } from '@/lib/app-utils';
 import { QueryClient, queryOptions } from '@tanstack/react-query';
 
+export const campaignNotFoundError = new Error('Campaign not found');
+
 export const getCampaigns = createServerFn({ method: 'GET' })
 	.inputValidator(campaignsQueryParserschema)
 	.handler(async ({ data }) => {
@@ -62,6 +64,11 @@ export const getCampaign = createServerFn({ method: 'GET' })
 
 		if (!res.ok) {
 			console.error('❌ API error:', res.status, res.statusText);
+
+			if (res.status === 404) {
+				throw campaignNotFoundError;
+			}
+
 			throw new Error(
 				`Failed to fetch campaign: ${res.status} ${res.statusText}`
 			);
@@ -112,7 +119,10 @@ export const updateCampaignQueryData = (
 			};
 
 			// Check if campaign is now completed
-			if (newSuiRaised >= oldData.campaign.target && oldData.campaign.status === 'Active') {
+			if (
+				newSuiRaised >= oldData.campaign.target &&
+				oldData.campaign.status === 'Active'
+			) {
 				updatedData.campaign.status = 'Completed';
 				updatedData.campaign.completedAt = new Date();
 			}
