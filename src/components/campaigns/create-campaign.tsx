@@ -51,6 +51,7 @@ export function CreateCampaign({
 		minContribution: null,
 		creatorContribution: null,
 	});
+
 	const {
 		data: nftData,
 		isLoading: isFetchingNftData,

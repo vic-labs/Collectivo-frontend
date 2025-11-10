@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
 	useSignAndExecuteTransaction,
@@ -13,6 +13,7 @@ import { updateCampaignQueryData } from '@/utils/campaigns';
 import { calculateDepositWithFee, formatSuiAmount } from '@/lib/app-utils';
 import { ViewTxLink } from '@/components/view-tx-link';
 import { MIST_PER_SUI } from '@mysten/sui/utils';
+import { NFT_NOT_LISTED_ERROR, getNftDataQueryOptions } from '@/utils/nft';
 
 
 
@@ -23,6 +24,11 @@ export function useContributeToCampaign(campaignId: string) {
 	const { mutateAsync: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 	const currentAccount = useCurrentAccount();
 
+	const {
+		isError: isErrorNftData,
+		error: errorNftData,
+	} = useQuery(getNftDataQueryOptions(campaignId));
+
 	const contributeToCampaign = useCallback(async (params: {
 		amount: number;
 		campaign: Campaign;
@@ -31,8 +37,13 @@ export function useContributeToCampaign(campaignId: string) {
 		balance?: number;
 		userBalance?: number;
 	}) => {
+
 		if (!currentAccount) {
 			throw new Error('Please connect your wallet to contribute');
+		}
+
+		if (isErrorNftData && errorNftData === NFT_NOT_LISTED_ERROR) {
+			throw new Error('NFT not listed anymore');
 		}
 
 		// Validation
