@@ -73,8 +73,24 @@ export function mistToSui(mist: bigint | string | number): number {
     return Number(mist) / Number(MIST_PER_SUI);
 }
 
-export function suiToMist(sui: number): bigint {
-    return BigInt(Math.floor(sui * Number(MIST_PER_SUI)));
+/**
+ * Convert a decimal SUI amount (e.g., 0.206) to MIST as BigInt safely.
+ * Avoids floating-point precision issues by scaling.
+ *
+ * @param suiAmount SUI amount as number (can be fractional)
+ * @returns Amount in MIST as BigInt
+ */
+export function suiToMistSafeSafe(suiAmount: number): bigint {
+    // Convert to string to avoid JS float precision errors
+    const parts = suiAmount.toString().split(".");
+    const whole = BigInt(parts[0] || "0");
+    const fraction = parts[1] || "0";
+
+    const scale = BigInt(10 ** fraction.length);
+    const fractionValue = BigInt(fraction);
+
+    // total MIST = whole * MIST_PER_SUI + (fraction / scale) * MIST_PER_SUI
+    return whole * MIST_PER_SUI + (fractionValue * MIST_PER_SUI) / scale;
 }
 
 export function generateCampaignId(): string {

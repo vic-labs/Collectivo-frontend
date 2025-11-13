@@ -11,7 +11,7 @@ import * as campaignModule from '@/contract-sdk/collectivo/campaign';
 import { NewCampaign } from '@collectivo/shared-types';
 import { useRouter } from '@tanstack/react-router';
 import { createEmptyCampaignCache } from '@/utils/campaigns';
-import { calculateDepositWithFee, suiToMist, mistToSui } from '@/lib/app-utils';
+import { calculateDepositWithFee, suiToMistSafe, mistToSui } from '@/lib/app-utils';
 import { SUI_NFT_API_RESPONSE } from '@/lib/app-utils';
 
 type NftData = SUI_NFT_API_RESPONSE & { listingPrice: number };
@@ -62,7 +62,7 @@ export function useCreateCampaign() {
 		const tx = new Transaction();
 
 		const [creatorContributionCoin] = tx.splitCoins(tx.gas, [
-			calculateDepositWithFee(suiToMist(params.creatorContribution)),
+			calculateDepositWithFee(suiToMistSafe(params.creatorContribution)),
 		]);
 
 		tx.add(
@@ -74,8 +74,8 @@ export function useCreateCampaign() {
 					rank: params.nftData.rank,
 					nftType: params.nftData.type,
 					description: params.description,
-					target: BigInt(params.nftData.listingPrice) + suiToMist(0.1),
-					minContribution: suiToMist(params.minContribution),
+					target: BigInt(params.nftData.listingPrice) + suiToMistSafe(0.1),
+					minContribution: suiToMistSafe(params.minContribution),
 					contribution: creatorContributionCoin,
 				},
 			})

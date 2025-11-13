@@ -10,7 +10,7 @@ import { Transaction } from '@mysten/sui/transactions';
 import * as proposalModule from '@/contract-sdk/collectivo/proposal';
 import { Proposal } from '@collectivo/shared-types';
 import { updateCampaignQueryData } from '@/utils/campaigns';
-import { suiToMist } from '@/lib/app-utils';
+import { suiToMistSafe } from '@/lib/app-utils';
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 
@@ -41,7 +41,7 @@ export function useCreateProposal(campaignId: string) {
 		if (params.proposalType === 'List') {
 			proposalTypeArg = proposalModule.newListProposalType({
 				arguments: {
-					price: suiToMist(params.listPrice!),
+					price: suiToMistSafe(params.listPrice!),
 				},
 			});
 		} else {
@@ -95,7 +95,7 @@ export function useCreateProposal(campaignId: string) {
 			campaignId: campaignId,
 			proposer: currentAccount.address,
 			proposalType: params.proposalType,
-			listPrice: params.proposalType === 'List' && params.listPrice ? suiToMist(params.listPrice) : null,
+			listPrice: params.proposalType === 'List' && params.listPrice ? suiToMistSafe(params.listPrice) : null,
 			status: 'Active',
 			createdAt: new Date(),
 			endedAt: null,
