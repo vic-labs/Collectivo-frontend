@@ -12,9 +12,9 @@ import { NewCampaign } from '@collectivo/shared-types';
 import { useRouter } from '@tanstack/react-router';
 import { createEmptyCampaignCache } from '@/utils/campaigns';
 import { calculateDepositWithFee, suiToMistSafe, mistToSui } from '@/lib/app-utils';
-import { SUI_NFT_API_RESPONSE } from '@/lib/app-utils';
+import { suiNftApiResponse } from '@/lib/app-utils';
 
-type NftData = SUI_NFT_API_RESPONSE & { listingPrice: number };
+type NftData = suiNftApiResponse & { listingPrice: number };
 
 const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
 

@@ -1,7 +1,7 @@
 import { SuiClient } from "@mysten/sui/client";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
 
-export type SUI_NFT_API_RESPONSE = {
+export type suiNftApiResponse = {
     id: string;
     name: string;
     imageUrl: string;
