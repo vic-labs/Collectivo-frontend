@@ -24,7 +24,7 @@ export const CampaignActions = ({
 }: CampaignActionsProps) => {
 	const network = useNetwork();
 	const [activityFilter, setActivityFilter] = useState<'all' | 'mine'>('all');
-	
+
 	// Calculate user's contribution and withdrawals
 	const userContributions = contributions
 		.filter((c) => c.contributor === userAddress)
@@ -38,13 +38,15 @@ export const CampaignActions = ({
 	const isActive = campaign.status === 'Active';
 
 	// Filter activities based on selected tab
-	const filteredContributions = activityFilter === 'mine' && userAddress
-		? contributions.filter(c => c.contributor === userAddress)
-		: contributions;
-	
-	const filteredWithdrawals = activityFilter === 'mine' && userAddress
-		? withdrawals.filter(w => w.contributor === userAddress)
-		: withdrawals;
+	const filteredContributions =
+		activityFilter === 'mine' && userAddress
+			? contributions.filter((c) => c.contributor === userAddress)
+			: contributions;
+
+	const filteredWithdrawals =
+		activityFilter === 'mine' && userAddress
+			? withdrawals.filter((w) => w.contributor === userAddress)
+			: withdrawals;
 
 	return (
 		<div className='space-y-6'>
@@ -59,8 +61,8 @@ export const CampaignActions = ({
 					</CardHeader>
 					<CardContent className='space-y-3'>
 						{userAddress ? (
-							<ContributeWithdraw 
-								mode="contribute"
+							<ContributeWithdraw
+								mode='contribute'
 								campaign={campaign}
 								contributions={contributions}
 								withdrawals={withdrawals}
@@ -70,8 +72,8 @@ export const CampaignActions = ({
 							<ConnectButton className='bg-primary! w-full text-white!' />
 						)}
 						{userAddress && (
-							<ContributeWithdraw 
-								mode="withdraw"
+							<ContributeWithdraw
+								mode='withdraw'
 								campaign={campaign}
 								contributions={contributions}
 								withdrawals={withdrawals}
@@ -101,60 +103,71 @@ export const CampaignActions = ({
 					</div>
 				</CardHeader>
 				<CardContent>
-					<Tabs value={activityFilter} onValueChange={(v) => setActivityFilter(v as 'all' | 'mine')} className="w-full">
-						<TabsList className="grid w-full grid-cols-2 mb-4">
-							<TabsTrigger value="all">All</TabsTrigger>
-							<TabsTrigger value="mine" disabled={!userAddress}>My Activity</TabsTrigger>
+					<Tabs
+						value={activityFilter}
+						onValueChange={(v) => setActivityFilter(v as 'all' | 'mine')}
+						className='w-full'>
+						<TabsList className='grid w-full grid-cols-2 mb-4'>
+							<TabsTrigger value='all'>All</TabsTrigger>
+							<TabsTrigger value='mine' disabled={!userAddress}>
+								My Activity
+							</TabsTrigger>
 						</TabsList>
-						<TabsContent value={activityFilter} className="mt-0">
-							{filteredContributions.length === 0 && filteredWithdrawals.length === 0 ? (
+						<TabsContent value={activityFilter} className='mt-0'>
+							{filteredContributions.length === 0 &&
+							filteredWithdrawals.length === 0 ? (
 								<p className='text-sm text-muted-foreground text-center py-8'>
-									{activityFilter === 'mine' ? 'You have no activity yet.' : 'No activity yet. Be the first to contribute!'}
+									{activityFilter === 'mine'
+										? 'You have no activity yet.'
+										: 'No activity yet. Be the first to contribute!'}
 								</p>
 							) : (
 								<div className='space-y-3 max-h-[400px] overflow-y-auto'>
-									{combineAndSortActivities(filteredContributions, filteredWithdrawals).map(
-										(activity, index) => (
-											<div key={index}>
-												<a
-													href={EXPLORER_TX_URL({
-														chain: network,
-														txHash: activity.txHash || '',
-													})}
-													target='_blank'
-													className='flex items-center justify-between py-2 hover:bg-primary/5 px-1 rounded-t-lg transition-colors'>
-													<div className='flex items-center gap-3'>
-														<div
-															className={`w-2 h-2 rounded-full ${
-																activity.type === 'contribution'
-																	? 'bg-green-500'
-																	: 'bg-orange-500'
-															}`}
-														/>
-														<div>
-															<p className='text-sm font-medium'>
-																{activity.type === 'contribution'
-																	? 'Contributed'
-																	: 'Withdrew'}{' '}
-																{formatSuiAmount(activity.amount)} SUI
-															</p>
-															<p className='text-xs text-muted-foreground font-mono'>
-																{formatAddress(activity.address, userAddress)}
-															</p>
-														</div>
+									{combineAndSortActivities(
+										filteredContributions,
+										filteredWithdrawals
+									).map((activity, index) => (
+										<div key={index}>
+											<a
+												href={EXPLORER_TX_URL({
+													chain: network,
+													txHash: activity.txHash || '',
+												})}
+												target='_blank'
+												className='flex items-center justify-between py-2 hover:bg-primary/5 px-1 rounded-t-lg transition-colors'>
+												<div className='flex items-center gap-3'>
+													<div
+														className={`w-2 h-2 rounded-full ${
+															activity.type === 'contribution'
+																? 'bg-green-500'
+																: 'bg-orange-500'
+														}`}
+													/>
+													<div>
+														<p className='text-sm font-medium'>
+															{activity.type === 'contribution'
+																? 'Contributed'
+																: 'Withdrew'}{' '}
+															{formatSuiAmount(activity.amount)} SUI
+														</p>
+														<p className='text-xs text-muted-foreground font-mono'>
+															{formatAddress(activity.address, userAddress)}
+														</p>
 													</div>
-													<p className='text-xs text-muted-foreground'>
-														{formatTimeAgo(activity.date)}
-													</p>
-												</a>
-												{index <
-													Math.min(
-														9,
-														filteredContributions.length + filteredWithdrawals.length - 1
-													) && <Separator />}
-											</div>
-										)
-									)}
+												</div>
+												<p className='text-xs text-muted-foreground'>
+													{formatTimeAgo(activity.date)}
+												</p>
+											</a>
+											{index <
+												Math.min(
+													9,
+													filteredContributions.length +
+														filteredWithdrawals.length -
+														1
+												) && <Separator />}
+										</div>
+									))}
 								</div>
 							)}
 						</TabsContent>

@@ -3,7 +3,7 @@ import { Progress } from '@/components/ui/progress';
 import { formatAddress, formatNumberToHumanReadable } from '@/lib/app-utils';
 import { Campaign } from '@collectivo/shared-types';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { User } from 'lucide-react';
+import { User, Wallet, CheckCircle } from 'lucide-react';
 import { RankBadge } from '../rank-badge';
 import { ViewAddressLink } from '../view-tx-link';
 
@@ -40,36 +40,40 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 				</div>
 
 				{/* Progress */}
-				<div className='space-y-3'>
-					<div className='flex justify-between items-center'>
-						<span className='text-sm font-medium text-muted-foreground'>
-							{campaign.status === 'Completed'
-								? 'Funding Goal'
-								: 'Funding Progress'}
-						</span>
-						<span className='text-lg font-bold'>
-							{campaign.status === 'Completed'
-								? '100%'
-								: `${progressPercentage.toFixed(1)}%`}
+				{campaign.status === 'Completed' ? (
+					<div className='flex items-center justify-center gap-2 py-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800'>
+						<CheckCircle className='h-5 w-5 text-green-600 dark:text-green-400' />
+						<span className='font-semibold text-green-700 dark:text-green-300'>
+							Campaign Completed
 						</span>
 					</div>
-					<Progress
-						value={campaign.status === 'Completed' ? 100 : progressPercentage}
-						className='h-3'
-					/>
-				</div>
+				) : (
+					<div className='space-y-3'>
+						<div className='flex justify-between items-center'>
+							<span className='text-sm font-medium text-muted-foreground'>
+								Funding Progress
+							</span>
+							<span className='text-lg font-bold'>
+								{progressPercentage.toFixed(1)}%
+							</span>
+						</div>
+						<Progress value={progressPercentage} className='h-3' />
+					</div>
+				)}
 
 				{/* Stats Grid */}
 				<div className='grid grid-cols-2 gap-4 pt-2'>
-					<div className='space-y-1'>
-						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
-							Raised
-						</p>
-						<p className='text-2xl font-bold flex items-center gap-1'>
-							<img src='/sui.svg' alt='sui' className='size-5' />
-							{formatNumberToHumanReadable(campaign.suiRaised)}
-						</p>
-					</div>
+					{campaign.status !== 'Completed' && (
+						<div className='space-y-1'>
+							<p className='text-xs text-muted-foreground uppercase tracking-wide'>
+								Raised
+							</p>
+							<p className='text-2xl font-bold flex items-center gap-1'>
+								<img src='/sui.svg' alt='sui' className='size-5' />
+								{formatNumberToHumanReadable(campaign.suiRaised)}
+							</p>
+						</div>
+					)}
 					<div className='space-y-1'>
 						<p className='text-xs text-muted-foreground uppercase tracking-wide'>
 							Target
@@ -100,6 +104,20 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 							/>
 						</p>
 					</div>
+					{campaign.walletAddress && (
+						<div className='space-y-1'>
+							<p className='text-xs text-muted-foreground uppercase tracking-wide'>
+								Wallet Address
+							</p>
+							<p className='text-sm font-mono truncate flex items-center gap-2'>
+								<Wallet className='size-4 text-muted-foreground' />
+								<ViewAddressLink
+									address={formatAddress(campaign.walletAddress, account?.address)}
+									fullAddress={campaign.walletAddress}
+								/>
+							</p>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
