@@ -80,7 +80,7 @@ export function mistToSui(mist: bigint | string | number): number {
  * @param suiAmount SUI amount as number (can be fractional)
  * @returns Amount in MIST as BigInt
  */
-export function suiToMistSafeSafe(suiAmount: number): bigint {
+export function suiToMistSafe(suiAmount: number): bigint {
     // Convert to string to avoid JS float precision errors
     const parts = suiAmount.toString().split(".");
     const whole = BigInt(parts[0] || "0");
