@@ -43,6 +43,7 @@ function RouteComponent() {
 							campaignId={campaign.id}
 							nftPurchased={campaign.nft.isPurchased}
 							proposals={proposals}
+							contributions={contributions}
 							showForCompleted={showProposals}
 						/>
 					)}
