@@ -7,7 +7,8 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { formatAddress } from '@/lib/app-utils';
-import { Contribution, Proposal } from '@collectivo/shared-types';
+import { calculateVoteStats } from '@/lib/utils/vote-utils';
+import { Contribution, Proposal, Vote } from '@collectivo/shared-types';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { Loader } from 'lucide-react';
 import { ViewAddressLink } from '../view-tx-link';
@@ -22,13 +23,6 @@ type Props = {
 	showForCompleted?: boolean;
 };
 
-// Define a type for Vote if it's not exported or to fix the error
-type Vote = {
-	voteType: 'Approval' | 'Rejection';
-	voter: string;
-};
-
-// Extend Proposal to include votes if it's missing in the shared type
 type ProposalWithVotes = Proposal & {
 	votes?: Vote[];
 };
@@ -70,20 +64,6 @@ export function Proposals({
 		contributions.some(
 			(c) => c.contributor.toLowerCase() === currentAccount.address.toLowerCase()
 		);
-
-	// Calculate total voting power (sum of all contributions)
-	const totalVotingPower = contributions.reduce(
-		(sum, c) => sum + c.amount,
-		0
-	);
-
-	// Helper to get voter's power
-	const getVoterPower = (voterAddress: string) => {
-		const contribution = contributions.find(
-			(c) => c.contributor === voterAddress
-		);
-		return contribution ? contribution.amount : 0;
-	};
 
 	// Show message when campaign completed but NFT not purchased yet
 	if (!nftPurchased) {
@@ -140,41 +120,13 @@ export function Proposals({
 					<div className='space-y-3'>
 						{proposals.map((p) => {
 							const proposal = p as ProposalWithVotes;
-							const votes = proposal.votes || [];
-							const totalVotes = votes.length;
-
-							const approvalVotes = votes.filter(
-								(v: Vote) => v.voteType === 'Approval'
-							);
-							const rejectionVotes = votes.filter(
-								(v: Vote) => v.voteType === 'Rejection'
-							);
-
-							const approvalPower = approvalVotes.reduce(
-								(sum, v) => sum + getVoterPower(v.voter),
-								0
-							);
-							const rejectionPower = rejectionVotes.reduce(
-								(sum, v) => sum + getVoterPower(v.voter),
-								0
-							);
-
-							const approvalPercentage =
-								totalVotingPower > 0
-									? (approvalPower / totalVotingPower) * 100
-									: 0;
-							const rejectionPercentage =
-								totalVotingPower > 0
-									? (rejectionPower / totalVotingPower) * 100
-									: 0;
-
-							const userVote =
-								currentAccount &&
-								votes.find(
-									(v: Vote) =>
-										v.voter.toLowerCase() ===
-										currentAccount.address.toLowerCase()
-								);
+							
+							// Use the utility function to calculate vote stats
+							const voteStats = calculateVoteStats({
+								proposal,
+								contributions,
+								currentUserAddress: currentAccount?.address,
+							});
 
 							return (
 								<Card key={proposal.id} className='border'>
@@ -223,24 +175,24 @@ export function Proposals({
 									</CardHeader>
 									<CardContent className='p-3 pt-0 space-y-3'>
 										{/* Vote Visualization */}
-										{totalVotes > 0 ? (
+										{voteStats.totalVotes > 0 ? (
 											<div className='space-y-1.5'>
 												<div className='flex h-1.5 w-full overflow-hidden rounded-full bg-secondary'>
 													<div
 														className='bg-green-500 transition-all duration-500 ease-in-out'
-														style={{ width: `${approvalPercentage}%` }}
+														style={{ width: `${voteStats.approvalPercentage}%` }}
 													/>
 													<div
 														className='bg-red-500 transition-all duration-500 ease-in-out'
-														style={{ width: `${rejectionPercentage}%` }}
+														style={{ width: `${voteStats.rejectionPercentage}%` }}
 													/>
 												</div>
 												<div className='flex justify-between text-[10px] text-muted-foreground font-medium uppercase tracking-wider'>
 													<span className='flex items-center gap-1'>
-														{approvalVotes.length} Approved ({approvalPercentage.toFixed(1)}% power)
+														{voteStats.approvalVotes.length} Approved ({voteStats.approvalPercentage.toFixed(1)}% power)
 													</span>
 													<span className='flex items-center gap-1'>
-														{rejectionVotes.length} Rejected ({rejectionPercentage.toFixed(1)}% power)
+														{voteStats.rejectionVotes.length} Rejected ({voteStats.rejectionPercentage.toFixed(1)}% power)
 													</span>
 												</div>
 											</div>
@@ -260,7 +212,7 @@ export function Proposals({
 									<p className='text-xs text-muted-foreground font-medium'>
 										You created this proposal
 									</p>
-								) : userVote ? (
+								) : voteStats.userVote ? (
 									<div className='flex items-center gap-2 text-xs font-medium'>
 										<span className='text-muted-foreground'>
 											You voted:
@@ -268,11 +220,11 @@ export function Proposals({
 										<Badge
 											variant='outline'
 											className={
-												userVote.voteType === 'Approval'
+												voteStats.userVote.voteType === 'Approval'
 													? 'text-green-600 border-green-200 bg-green-50'
 													: 'text-red-600 border-red-200 bg-red-50'
 											}>
-											{userVote.voteType}
+											{voteStats.userVote.voteType}
 										</Badge>
 									</div>
 								) : (
