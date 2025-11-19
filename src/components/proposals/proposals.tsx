@@ -64,6 +64,13 @@ export function Proposals({
 		return null;
 	}
 
+	// Check if current user is a contributor
+	const isContributor =
+		currentAccount &&
+		contributions.some(
+			(c) => c.contributor.toLowerCase() === currentAccount.address.toLowerCase()
+		);
+
 	// Calculate total voting power (sum of all contributions)
 	const totalVotingPower = contributions.reduce(
 		(sum, c) => sum + c.amount,
@@ -116,7 +123,9 @@ export function Proposals({
 							Vote on proposals to manage the co-owned NFT
 						</CardDescription>
 					</div>
-					{currentAccount && <CreateProposal campaignId={campaignId} />}
+					{currentAccount && isContributor && (
+						<CreateProposal campaignId={campaignId} />
+					)}
 				</div>
 			</CardHeader>
 			<CardContent>
@@ -242,34 +251,38 @@ export function Proposals({
 										)}
 
 										{proposal.status === 'Active' && currentAccount && (
-											<>
-												{currentAccount.address === proposal.proposer ? (
-													<p className='text-xs text-muted-foreground font-medium'>
-														You created this proposal
-													</p>
-												) : userVote ? (
-													<div className='flex items-center gap-2 text-xs font-medium'>
-														<span className='text-muted-foreground'>
-															You voted:
-														</span>
-														<Badge
-															variant='outline'
-															className={
-																userVote.voteType === 'Approval'
-																	? 'text-green-600 border-green-200 bg-green-50'
-																	: 'text-red-600 border-red-200 bg-red-50'
-															}>
-															{userVote.voteType}
-														</Badge>
-													</div>
-												) : (
-													<Voting
-														proposalId={proposal.id}
-														campaignId={campaignId}
-													/>
-												)}
-											</>
-										)}
+							<>
+								{!isContributor ? (
+									<p className='text-xs text-muted-foreground italic'>
+										Only contributors can participate in governance
+									</p>
+								) : currentAccount.address === proposal.proposer ? (
+									<p className='text-xs text-muted-foreground font-medium'>
+										You created this proposal
+									</p>
+								) : userVote ? (
+									<div className='flex items-center gap-2 text-xs font-medium'>
+										<span className='text-muted-foreground'>
+											You voted:
+										</span>
+										<Badge
+											variant='outline'
+											className={
+												userVote.voteType === 'Approval'
+													? 'text-green-600 border-green-200 bg-green-50'
+													: 'text-red-600 border-red-200 bg-red-50'
+											}>
+											{userVote.voteType}
+										</Badge>
+									</div>
+								) : (
+									<Voting
+										proposalId={proposal.id}
+										campaignId={campaignId}
+									/>
+								)}
+							</>
+						)}
 									</CardContent>
 								</Card>
 							);
