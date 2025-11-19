@@ -11,9 +11,7 @@ function RouteComponent() {
 				<header className='mb-8'>
 					<h1 className='text-3xl font-bold'>Collectivo Dashboard</h1>
 				</header>
-				<main>
-					<Outlet />
-				</main>
+				<Outlet />
 			</div>
 		</div>
 	);
