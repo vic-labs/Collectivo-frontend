@@ -118,7 +118,7 @@ export const updateCampaignQueryData = (
 				suiRaised: newSuiRaised,
 			};
 
-			// Check if campaign is now completed
+			// Check if campaign is now completed 
 			if (
 				newSuiRaised >= oldData.campaign.target &&
 				oldData.campaign.status === 'Active'
