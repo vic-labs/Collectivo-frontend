@@ -46,7 +46,7 @@ export function ContributeWithdraw({
 	);
 
 	// Calculate values based on mode
-	const remainingAmount = campaign.target - campaign.suiRaised;
+	const remainingAmount = (campaign.target - campaign.suiRaised) * 1.01;
 	const userContributions = contributions
 		.filter((c) => c.contributor === userAddress)
 		.reduce((sum, c) => sum + c.amount, 0);
