@@ -1,4 +1,4 @@
-import { SUI_NFT_API_RESPONSE } from '@/lib/app-utils';
+import { suiNftApiResponse } from '@/lib/app-utils';
 import { getNativeKioskListingPrice } from '@/lib/app-utils/nft';
 import { SUI_NFT_API } from '@/lib/constants';
 import { isValidSuiObjectId } from '@mysten/sui/utils';
@@ -23,7 +23,7 @@ export const getNftData = createServerFn({ method: 'GET' })
 				throw new Error('Failed to fetch NFT data');
 			}
 
-			const suiNftData = (await suiNftResponse.json()) as SUI_NFT_API_RESPONSE;
+			const suiNftData = (await suiNftResponse.json()) as suiNftApiResponse;
 
 			const listingPrice = await getNativeKioskListingPrice({
 				nftId: data.id,

@@ -104,6 +104,7 @@ export async function getNativeKioskListingPrice({
         // Final total mist
         const totalMist = listingMist + royaltyMist + platformFeeMist;
 
+        console.log("Listing price details:")
         console.log({
             listingMist,
             royaltyMist,
