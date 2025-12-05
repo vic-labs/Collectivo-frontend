@@ -103,3 +103,20 @@ export function formatNumberToHumanReadable(number?: number): string {
     // Add thousand separators for integers
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
+
+export function calculateUserPower(
+    contributions: { amount: number; contributor: string }[],
+    userAddress?: string
+): number {
+    const totalRaised = contributions.reduce((sum, c) => sum + c.amount, 0);
+    const userContribution = userAddress
+        ? contributions
+            .filter(
+                (c) =>
+                    c.contributor.toLowerCase() === userAddress.toLowerCase()
+            )
+            .reduce((sum, c) => sum + c.amount, 0)
+        : 0;
+
+    return totalRaised > 0 ? (userContribution / totalRaised) * 100 : 0;
+}

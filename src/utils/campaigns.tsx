@@ -142,29 +142,31 @@ export const updateCampaignQueryData = (
 		}
 
 		// Add new proposal if provided
-	if (updates.newProposal) {
-		// Get the proposer's contribution to calculate voting weight
-		const proposerContribution = oldData.contributions.find(
-			(c) => c.contributor === updates.newProposal!.proposer
-		);
-		const votingWeight = proposerContribution ? proposerContribution.amount : 0;
+		if (updates.newProposal) {
+			// Get the proposer's contribution to calculate voting weight
+			const proposerContribution = oldData.contributions.find(
+				(c) => c.contributor === updates.newProposal!.proposer
+			);
+			const votingWeight = proposerContribution
+				? proposerContribution.amount
+				: 0;
 
-		const proposalWithVotes = {
-			...updates.newProposal,
-			votes: [
-				{
-					id: Date.now(), // Temporary ID for optimistic update
-					txDigest: null, // Will be filled when real data comes from backend
-					proposalId: updates.newProposal.id,
-					voter: updates.newProposal.proposer,
-					voteType: 'Approval' as const,
-					votingWeight,
-					votedAt: new Date(),
-				},
-			], // Initialize with creator's approval vote
-		};
-		updatedData.proposals = [...oldData.proposals, proposalWithVotes];
-	}
+			const proposalWithVotes = {
+				...updates.newProposal,
+				votes: [
+					{
+						id: Date.now(), // Temporary ID for optimistic update
+						txDigest: null, // Will be filled when real data comes from backend
+						proposalId: updates.newProposal.id,
+						voter: updates.newProposal.proposer,
+						voteType: 'Approval' as const,
+						votingWeight,
+						votedAt: new Date(),
+					},
+				], // Initialize with creator's approval vote
+			};
+			updatedData.proposals = [proposalWithVotes, ...oldData.proposals];
+		}
 
 		// Update proposal status if provided
 		if (updates.proposalId && updates.statusUpdate) {
@@ -173,7 +175,7 @@ export const updateCampaignQueryData = (
 					? {
 							...proposal,
 							status: updates.statusUpdate as 'Active' | 'Passed' | 'Rejected',
-					  }
+						}
 					: proposal
 			);
 		}

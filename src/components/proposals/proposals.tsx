@@ -1,19 +1,21 @@
 import { Badge } from '@/components/ui/badge';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
-import { formatAddress } from '@/lib/app-utils';
+import { formatAddress, calculateUserPower } from '@/lib/app-utils';
+import { useVoteOnProposal } from '@/lib/hooks/proposals/useVoteOnProposal';
 import { calculateVoteStats } from '@/lib/utils/vote-utils';
 import { Contribution, Proposal, Vote } from '@collectivo/shared-types';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { Loader } from 'lucide-react';
+import {
+	CheckCircle2,
+	Gavel,
+	Loader,
+	Megaphone,
+	Timer,
+	ThumbsDown,
+	ThumbsUp,
+	TrendingUp,
+} from 'lucide-react';
 import { ViewAddressLink } from '../view-tx-link';
 import { CreateProposal } from './create-proposal';
-import { Voting } from './voting';
 
 type Props = {
 	campaignId: string;
@@ -27,23 +29,6 @@ type ProposalWithVotes = Proposal & {
 	votes?: Vote[];
 };
 
-function getProposalStatusColor(status: string): string {
-	switch (status) {
-		case 'Active':
-			return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-		case 'Passed':
-			return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-		case 'Rejected':
-			return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-		default:
-			return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-	}
-}
-
-function formatProposalType(type: 'List' | 'Delist'): string {
-	return type === 'List' ? '📝 List NFT for Sale' : '🚫 Delist NFT';
-}
-
 export function Proposals({
 	campaignId,
 	nftPurchased,
@@ -53,195 +38,289 @@ export function Proposals({
 }: Props) {
 	const currentAccount = useCurrentAccount();
 
-	// Don't show if campaign is not completed
+	// Don't show if campaign is not completed (unless forced)
 	if (!showForCompleted) {
 		return null;
 	}
 
+	// Calculate User Power
+	const userPower = calculateUserPower(contributions, currentAccount?.address);
+
 	// Check if current user is a contributor
-	const isContributor =
-		currentAccount &&
-		contributions.some(
-			(c) => c.contributor.toLowerCase() === currentAccount.address.toLowerCase()
-		);
+	const isContributor = currentAccount
+		? contributions.some(
+				(c) =>
+					c.contributor.toLowerCase() === currentAccount.address.toLowerCase()
+			)
+		: false;
 
 	// Show message when campaign completed but NFT not purchased yet
 	if (!nftPurchased) {
 		return (
-			<Card className='border-2 border-muted'>
-				<CardHeader>
-					<CardTitle className='text-2xl'>Governance</CardTitle>
-					<CardDescription className='mt-1'>
-						Governance features will be available after the NFT is purchased
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<div className='text-center py-12 space-y-3'>
-						<div className='flex items-center justify-center gap-2'>
-							<Loader className='animate-spin h-5 w-5 text-muted-foreground' />
-							<p className='text-muted-foreground font-medium'>
-								Waiting for NFT purchase
-							</p>
-						</div>
-						<p className='text-sm text-muted-foreground'>
-							The campaign has been completed. Once the NFT is purchased, you'll
-							be able to create and vote on proposals.
+			<div className='bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden ring-1 ring-slate-900/5'>
+				{/* Header */}
+				<div className='p-6 bg-white border-b border-slate-100 relative overflow-hidden'>
+					<div className='absolute top-0 right-0 p-4 opacity-[0.03]'>
+						<Gavel size={80} className='text-slate-900' />
+					</div>
+					<div className='relative z-10'>
+						<h3 className='font-bold text-xl flex items-center gap-2 text-slate-900'>
+							<Gavel size={20} className='text-primary' />
+							Governance
+						</h3>
+						<p className='text-slate-500 text-sm mt-1'>
+							Governance features will be unlocked after NFT purchase
 						</p>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+				<div className='p-12 text-center space-y-3 bg-slate-50'>
+					<div className='flex items-center justify-center gap-2'>
+						<Loader className='animate-spin h-5 w-5 text-slate-400' />
+						<p className='text-slate-500 font-medium'>
+							Waiting for NFT purchase
+						</p>
+					</div>
+				</div>
+			</div>
 		);
 	}
 
 	return (
-		<Card className='border-2'>
-			<CardHeader className='pb-4'>
-				<div className='flex justify-between items-center'>
-					<div>
-						<CardTitle className='text-2xl'>Governance</CardTitle>
-						<CardDescription className='mt-1'>
-							Vote on proposals to manage the co-owned NFT
-						</CardDescription>
-					</div>
-					{currentAccount && isContributor && (
+		<div className='bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden ring-1 ring-slate-900/5'>
+			{/* Header */}
+			<div className='p-6 bg-white border-b border-slate-100 relative overflow-hidden'>
+				{/* Header Actions (Create Proposal) */}
+				{currentAccount && isContributor && (
+					<div className='absolute top-6 right-6 z-20'>
 						<CreateProposal campaignId={campaignId} />
-					)}
+					</div>
+				)}
+
+				<div className='absolute top-0 right-0 p-4 opacity-[0.03]'>
+					<Gavel size={80} className='text-slate-900' />
 				</div>
-			</CardHeader>
-			<CardContent>
+				<div className='relative z-10'>
+					<h3 className='font-bold text-xl flex items-center gap-2 text-slate-900'>
+						<Gavel size={20} className='text-primary' />
+						Governance
+					</h3>
+					<p className='text-slate-500 text-sm mt-1'>
+						Vote on proposals to manage the asset
+					</p>
+				</div>
+
+				{/* User Stats */}
+				<div className='mt-6 flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100 w-fit'>
+					<div>
+						<div className='text-[10px] text-slate-400 font-bold uppercase tracking-wider'>
+							Your Power
+						</div>
+						<div className='text-primary font-bold text-lg'>
+							{userPower.toFixed(1)}%
+						</div>
+					</div>
+					<div className='w-px h-8 bg-slate-200'></div>
+					<div>
+						<div className='text-[10px] text-slate-400 font-bold uppercase tracking-wider'>
+							Delegated
+						</div>
+						<div className='text-slate-900 font-bold text-lg'>0%</div>
+					</div>
+				</div>
+			</div>
+
+			<div className='p-4 space-y-4 bg-slate-50 min-h-[300px]'>
 				{proposals.length === 0 ? (
 					<div className='text-center py-12'>
-						<p className='text-muted-foreground mb-2'>No proposals yet</p>
-						<p className='text-sm text-muted-foreground'>
+						<p className='text-slate-400 mb-2'>No proposals yet</p>
+						<p className='text-sm text-slate-500'>
 							Be the first to propose listing or delisting the NFT
 						</p>
 					</div>
 				) : (
-					<div className='space-y-3'>
-						{proposals.map((p) => {
-							const proposal = p as ProposalWithVotes;
-							
-							// Use the utility function to calculate vote stats
-							const voteStats = calculateVoteStats({
-								proposal,
-								contributions,
-								currentUserAddress: currentAccount?.address,
-							});
+					proposals.map((p) => {
+						const proposal = p as ProposalWithVotes;
+						const voteStats = calculateVoteStats({
+							proposal,
+							contributions,
+							currentUserAddress: currentAccount?.address,
+						});
 
-							return (
-								<Card key={proposal.id} className='border'>
-									<CardHeader className='p-3 pb-2'>
-										<div className='flex justify-between items-start gap-3'>
-											<div className='flex-1'>
-												<div className='flex items-center gap-2 mb-1'>
-													<CardTitle className='text-base'>
-														{formatProposalType(proposal.proposalType)}
-													</CardTitle>
-													{proposal.proposalType === 'List' &&
-														proposal.listPrice && (
-															<Badge
-																variant='outline'
-																className='ml-2 bg-muted/50 text-sm font-bold px-2 py-0.5'>
-																<img
-																	src='/sui.svg'
-																	alt='sui'
-																	className='size-3.5 mr-1.5'
-																/>
-																{proposal.listPrice}
-															</Badge>
-														)}
-												</div>
-												<CardDescription className='text-xs flex items-center gap-1'>
-													<span>by</span>
-													<ViewAddressLink
-														address={formatAddress(
-															proposal.proposer,
-															currentAccount?.address
-														)}
-														fullAddress={proposal.proposer}
-													/>
-													<span>•</span>
-													<span>
-														{new Date(proposal.createdAt).toLocaleDateString()}
-													</span>
-												</CardDescription>
-											</div>
-											<Badge
-												className={getProposalStatusColor(proposal.status)}
-												variant='secondary'>
-												{proposal.status}
-											</Badge>
-										</div>
-									</CardHeader>
-									<CardContent className='p-3 pt-0 space-y-3'>
-										{/* Vote Visualization */}
-										{voteStats.totalVotes > 0 ? (
-											<div className='space-y-1.5'>
-												<div className='flex h-1.5 w-full overflow-hidden rounded-full bg-secondary'>
-													<div
-														className='bg-green-500 transition-all duration-500 ease-in-out'
-														style={{ width: `${voteStats.approvalPercentage}%` }}
-													/>
-													<div
-														className='bg-red-500 transition-all duration-500 ease-in-out'
-														style={{ width: `${voteStats.rejectionPercentage}%` }}
-													/>
-												</div>
-												<div className='flex justify-between text-[10px] text-muted-foreground font-medium uppercase tracking-wider'>
-													<span className='flex items-center gap-1'>
-														{voteStats.approvalVotes.length} Approved ({voteStats.approvalPercentage.toFixed(1)}% power)
-													</span>
-													<span className='flex items-center gap-1'>
-														{voteStats.rejectionVotes.length} Rejected ({voteStats.rejectionPercentage.toFixed(1)}% power)
-													</span>
-												</div>
-											</div>
-										) : (
-											<p className='text-xs text-muted-foreground italic'>
-												No votes yet
-											</p>
-										)}
+						return (
+							<ProposalCard
+								key={proposal.id}
+								proposal={proposal}
+								voteStats={voteStats}
+								campaignId={campaignId}
+								currentAccount={currentAccount}
+								isContributor={isContributor}
+							/>
+						);
+					})
+				)}
+			</div>
+		</div>
+	);
+}
 
-										{proposal.status === 'Active' && currentAccount && (
-							<>
-								{!isContributor ? (
-									<p className='text-xs text-muted-foreground italic'>
-										Only contributors can participate in governance
-									</p>
-								) : currentAccount.address === proposal.proposer ? (
-									<p className='text-xs text-muted-foreground font-medium'>
-										You created this proposal
-									</p>
-								) : voteStats.userVote ? (
-									<div className='flex items-center gap-2 text-xs font-medium'>
-										<span className='text-muted-foreground'>
-											You voted:
-										</span>
-										<Badge
-											variant='outline'
-											className={
-												voteStats.userVote.voteType === 'Approval'
-													? 'text-green-600 border-green-200 bg-green-50'
-													: 'text-red-600 border-red-200 bg-red-50'
-											}>
-											{voteStats.userVote.voteType}
-										</Badge>
-									</div>
-								) : (
-									<Voting
-										proposalId={proposal.id}
-										campaignId={campaignId}
-									/>
-								)}
-							</>
+function ProposalCard({
+	proposal,
+	voteStats,
+	campaignId,
+	currentAccount,
+	isContributor,
+}: {
+	proposal: ProposalWithVotes;
+	voteStats: any;
+	campaignId: string;
+	currentAccount: any;
+	isContributor: boolean;
+}) {
+	const { vote, isVoting } = useVoteOnProposal(proposal.id, campaignId);
+	const { totalVotes, approvalPercentage, rejectionPercentage } = voteStats;
+
+	const handleVote = async (voteType: 'Approval' | 'Rejection') => {
+		try {
+			await vote(voteType);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	return (
+		<div className='bg-white p-5 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-slate-100 hover:border-blue-200 transition-all group'>
+			{/* Proposal Header */}
+			<div className='flex justify-between items-start mb-4'>
+				<div className='flex items-start gap-3'>
+					<div
+						className={`p-2.5 rounded-xl ${
+							proposal.proposalType === 'List'
+								? 'bg-emerald-50 text-emerald-600'
+								: 'bg-blue-50 text-blue-600'
+						}`}>
+						{proposal.proposalType === 'List' ? (
+							<TrendingUp size={20} />
+						) : (
+							<Megaphone size={20} />
 						)}
-									</CardContent>
-								</Card>
-							);
-						})}
+					</div>
+					<div>
+						<h4 className='font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors'>
+							{proposal.proposalType === 'List'
+								? 'List NFT for Sale'
+								: 'Delist NFT'}
+						</h4>
+						<div className='flex items-center gap-2 mt-1'>
+							<span className='text-[10px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100'>
+								<ViewAddressLink
+									address={`#${proposal.id.slice(0, 6).toUpperCase()}`}
+									fullAddress={proposal.id}
+								/>
+							</span>
+							<span className='text-xs text-slate-500'>
+								{new Date(proposal.createdAt).toLocaleDateString()}
+							</span>
+						</div>
+					</div>
+				</div>
+				{proposal.status === 'Passed' ? (
+					<div className='flex items-center gap-1 pl-2 pr-3 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase rounded-full border border-green-100'>
+						<CheckCircle2 size={12} /> Passed
+					</div>
+				) : proposal.status === 'Rejected' ? (
+					<div className='flex items-center gap-1 pl-2 pr-3 py-1 bg-red-50 text-red-700 text-[10px] font-bold uppercase rounded-full border border-red-100'>
+						<ThumbsDown size={12} /> Rejected
+					</div>
+				) : (
+					<div className='flex items-center gap-1 pl-2 pr-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase rounded-full border border-blue-100 animate-pulse'>
+						<Timer size={12} /> Active
 					</div>
 				)}
-			</CardContent>
-		</Card>
+			</div>
+
+			{/* Description/Value */}
+			{proposal.listPrice && (
+				<div className='mb-4 text-xs bg-slate-50 p-2 rounded-lg border border-slate-100 flex justify-between items-center'>
+					<span className='font-semibold text-slate-500'>Proposed Price</span>
+					<span className='font-bold text-slate-900 flex items-center gap-1'>
+						<img src='/sui.svg' alt='sui' className='size-3.5' />
+						{proposal.listPrice} SUI
+					</span>
+				</div>
+			)}
+
+			{/* Voting Progress */}
+			<div className='mb-4'>
+				<div className='flex justify-between text-[10px] font-bold text-slate-500 mb-1.5'>
+					<span>Votes</span>
+					<span>{totalVotes} Total</span>
+				</div>
+				<div className='h-2 w-full rounded-full overflow-hidden flex bg-slate-100'>
+					<div
+						className='bg-emerald-500 h-full transition-all duration-500'
+						style={{ width: `${approvalPercentage}%` }}></div>
+					<div
+						className='bg-rose-500 h-full transition-all duration-500'
+						style={{ width: `${rejectionPercentage}%` }}></div>
+				</div>
+				<div className='flex justify-between mt-1.5 text-[10px] font-medium text-slate-400'>
+					<span className='flex items-center gap-1 text-emerald-600'>
+						<ThumbsUp size={10} /> {approvalPercentage.toFixed(0)}%
+					</span>
+					<span className='flex items-center gap-1 text-rose-600'>
+						{rejectionPercentage.toFixed(0)}% <ThumbsDown size={10} />
+					</span>
+				</div>
+			</div>
+
+			{/* Action */}
+			{proposal.status === 'Active' ? (
+				<>
+					{!isContributor ? (
+						<div className='text-center pt-3 border-t border-slate-50 text-[10px] text-slate-400 uppercase font-bold tracking-widest'>
+							Only contributors can vote
+						</div>
+					) : voteStats.userVote ? (
+						<div className='text-center pt-3 border-t border-slate-50'>
+							<span
+								className={`text-xs font-bold ${
+									voteStats.userVote.voteType === 'Approval'
+										? 'text-emerald-600'
+										: 'text-rose-600'
+								}`}>
+								You voted {voteStats.userVote.voteType}
+							</span>
+						</div>
+					) : (
+						<div className='grid grid-cols-2 gap-2 mt-2'>
+							<button
+								onClick={() => handleVote('Approval')}
+								disabled={isVoting}
+								className='py-2 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition-colors disabled:opacity-50 flex items-center justify-center gap-1'>
+								{isVoting ? (
+									<Loader className='h-3 w-3 animate-spin' />
+								) : (
+									'Vote For'
+								)}
+							</button>
+							<button
+								onClick={() => handleVote('Rejection')}
+								disabled={isVoting}
+								className='py-2 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 text-xs font-bold hover:bg-rose-100 transition-colors disabled:opacity-50 flex items-center justify-center gap-1'>
+								{isVoting ? (
+									<Loader className='h-3 w-3 animate-spin' />
+								) : (
+									'Vote Against'
+								)}
+							</button>
+						</div>
+					)}
+				</>
+			) : (
+				<div className='text-center pt-3 border-t border-slate-50 text-[10px] text-slate-400 uppercase font-bold tracking-widest'>
+					Voting Closed
+				</div>
+			)}
+		</div>
 	);
 }
