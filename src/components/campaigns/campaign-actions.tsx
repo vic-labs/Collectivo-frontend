@@ -8,6 +8,7 @@ import { ConnectButton } from '@mysten/dapp-kit';
 import { useNetwork } from '@/lib/hooks/useNetwork';
 import { EXPLORER_TX_URL } from '@/lib/constants';
 import { useState } from 'react';
+import { CampaignAdminActions } from './admin-actions';
 
 type CampaignActionsProps = {
 	campaign: Campaign;
@@ -58,6 +59,10 @@ export const CampaignActions = ({
 						<p className='text-sm text-muted-foreground'>
 							Fund together, own together
 						</p>
+						<CampaignAdminActions
+							campaign={campaign}
+							userAddress={userAddress}
+						/>
 					</CardHeader>
 					<CardContent className='space-y-3'>
 						{userAddress ? (
@@ -146,7 +151,9 @@ export const CampaignActions = ({
 													<div>
 														<p className='text-sm font-medium'>
 															{activity.type === 'contribution'
-																? 'Contributed'
+																? activity.isFirstContribution
+																	? 'Created & Contributed'
+																	: 'Contributed'
 																: 'Withdrew'}{' '}
 															{formatSuiAmount(activity.amount)} SUI
 														</p>
@@ -192,13 +199,23 @@ function combineAndSortActivities(
 	contributions: Contribution[],
 	withdrawals: Withdrawal[]
 ) {
-	const activities = [
+	type Activity = {
+		type: 'contribution' | 'withdrawal';
+		amount: number;
+		address: string;
+		date: Date;
+		txHash: string | null;
+		isFirstContribution: boolean;
+	};
+
+	const activities: Activity[] = [
 		...contributions.map((c) => ({
 			type: 'contribution' as const,
 			amount: c.amount,
 			address: c.contributor,
 			date: new Date(c.contributedAt),
 			txHash: c.txDigest,
+			isFirstContribution: false,
 		})),
 		...withdrawals.map((w) => ({
 			type: 'withdrawal' as const,
@@ -206,7 +223,19 @@ function combineAndSortActivities(
 			address: w.contributor,
 			date: new Date(w.withdrawnAt),
 			txHash: w.txDigest,
+			isFirstContribution: false,
 		})),
 	];
-	return activities.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+	const sorted = activities.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+	// Mark the last contribution (oldest) as the first contribution (campaign creation)
+	const lastContribution = sorted
+		.reverse()
+		.find((a) => a.type === 'contribution');
+	if (lastContribution) {
+		lastContribution.isFirstContribution = true;
+	}
+
+	return sorted.reverse(); // Reverse back to newest first
 }

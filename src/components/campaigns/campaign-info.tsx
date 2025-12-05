@@ -3,7 +3,7 @@ import { Progress } from '@/components/ui/progress';
 import { formatAddress, formatNumberToHumanReadable } from '@/lib/app-utils';
 import { Campaign } from '@collectivo/shared-types';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import { User, Wallet, CheckCircle } from 'lucide-react';
+import { User, Wallet } from 'lucide-react';
 import { RankBadge } from '../rank-badge';
 import { ViewAddressLink } from '../view-tx-link';
 
@@ -23,6 +23,12 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 				<Badge
 					variant={campaign.status === 'Active' ? 'default' : 'secondary'}
 					className='absolute top-4 right-4'>
+					{campaign.status === 'Active' && (
+						<div className='relative flex size-2 mr-1'>
+							<span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75'></span>
+							<span className='relative inline-flex rounded-full size-2 bg-white'></span>
+						</div>
+					)}
 					{campaign.status}
 				</Badge>
 			</div>
@@ -40,26 +46,20 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 				</div>
 
 				{/* Progress */}
-				{campaign.status === 'Completed' ? (
-					<div className='flex items-center justify-center gap-2 py-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800'>
-						<CheckCircle className='h-5 w-5 text-green-600 dark:text-green-400' />
-						<span className='font-semibold text-green-700 dark:text-green-300'>
-							Campaign Completed
+				<div className='space-y-3'>
+					<div className='flex justify-between items-center'>
+						<span className='text-sm font-medium text-muted-foreground'>
+							Funding Progress
+						</span>
+						<span className='text-lg font-bold'>
+							{progressPercentage.toFixed(1)}%
 						</span>
 					</div>
-				) : (
-					<div className='space-y-3'>
-						<div className='flex justify-between items-center'>
-							<span className='text-sm font-medium text-muted-foreground'>
-								Funding Progress
-							</span>
-							<span className='text-lg font-bold'>
-								{progressPercentage.toFixed(1)}%
-							</span>
-						</div>
-						<Progress value={progressPercentage} className='h-3' />
-					</div>
-				)}
+					<Progress
+						value={progressPercentage}
+						className={`h-3 ${campaign.status === 'Completed' ? '[&>div]:!bg-green-500' : ''}`}
+					/>
+				</div>
 
 				{/* Stats Grid */}
 				<div className='grid grid-cols-2 gap-4 pt-2'>
@@ -112,7 +112,10 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 							<p className='text-sm font-mono truncate flex items-center gap-2'>
 								<Wallet className='size-4 text-muted-foreground' />
 								<ViewAddressLink
-									address={formatAddress(campaign.walletAddress, account?.address)}
+									address={formatAddress(
+										campaign.walletAddress,
+										account?.address
+									)}
 									fullAddress={campaign.walletAddress}
 								/>
 							</p>

@@ -95,7 +95,7 @@ export function useCreateProposal(campaignId: string) {
 			campaignId: campaignId,
 			proposer: currentAccount.address,
 			proposalType: params.proposalType,
-			listPrice: params.proposalType === 'List' && params.listPrice ? suiToMistSafe(params.listPrice) : null,
+			listPrice: params.proposalType === 'List' && params.listPrice ? params.listPrice : null,
 			status: 'Active',
 			createdAt: new Date(),
 			endedAt: null,
