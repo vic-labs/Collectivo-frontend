@@ -40,7 +40,7 @@ export const CampaignCard = ({
 					</div>
 				</CardHeader>
 				<CardContent className='px-4 pb-5'>
-					<div className='flex items-center gap-2 mb-1'>
+					<div className='flex items-center justify-between mb-1'>
 						<h3 className='text-lg font-semibold line-clamp-1'>
 							{campaign.nft.name}
 						</h3>

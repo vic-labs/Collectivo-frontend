@@ -100,12 +100,6 @@ export function generateCampaignId(): string {
 export function formatNumberToHumanReadable(number?: number): string {
     if (!number) return '0';
 
-    // Format with up to 2 decimal places
-    const formatted = number.toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-
-    // Strip unnecessary trailing zeros and decimal point
-    return formatted.replace(/\.?0+$/, '');
+    // Add thousand separators for integers
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }

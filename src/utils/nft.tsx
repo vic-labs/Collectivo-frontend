@@ -25,6 +25,9 @@ export const getNftData = createServerFn({ method: 'GET' })
 
 			const suiNftData = (await suiNftResponse.json()) as suiNftApiResponse;
 
+			// Ensure rank is a number, parsing if it's a string with comma
+			suiNftData.rank = parseFloat(String(suiNftData.rank).replace(',', '.'));
+
 			const listingPrice = await getNativeKioskListingPrice({
 				nftId: data.id,
 				nftType: suiNftData.type,
