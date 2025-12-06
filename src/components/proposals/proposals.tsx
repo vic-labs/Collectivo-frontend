@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
-import { formatAddress, calculateUserPower } from '@/lib/app-utils';
+import { calculateUserPower, formatTimeAgo } from '@/lib/app-utils';
 import { useVoteOnProposal } from '@/lib/hooks/proposals/useVoteOnProposal';
+import { useDeleteProposal } from '@/lib/hooks/proposals/useDeleteProposal';
 import { calculateVoteStats } from '@/lib/utils/vote-utils';
 import { Contribution, Proposal, Vote } from '@collectivo/shared-types';
 import { useCurrentAccount } from '@mysten/dapp-kit';
@@ -9,11 +9,23 @@ import {
 	Gavel,
 	Loader,
 	Megaphone,
-	Timer,
 	ThumbsDown,
 	ThumbsUp,
+	Timer,
+	Trash2,
 	TrendingUp,
 } from 'lucide-react';
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { ViewAddressLink } from '../view-tx-link';
 import { CreateProposal } from './create-proposal';
 
@@ -177,7 +189,12 @@ function ProposalCard({
 	isContributor: boolean;
 }) {
 	const { vote, isVoting } = useVoteOnProposal(proposal.id, campaignId);
+	const { deleteProposal, isDeleting } = useDeleteProposal({
+		proposalId: proposal.id,
+		campaignId,
+	});
 	const { totalVotes, approvalPercentage, rejectionPercentage } = voteStats;
+	const isCreator = currentAccount?.address === proposal.proposer;
 
 	const handleVote = async (voteType: 'Approval' | 'Rejection') => {
 		try {
@@ -211,14 +228,17 @@ function ProposalCard({
 								: 'Delist NFT'}
 						</h4>
 						<div className='flex items-center gap-2 mt-1'>
-							<span className='text-[10px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100'>
+							<span className='text-[10px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-1'>
 								<ViewAddressLink
-									address={`#${proposal.id.slice(0, 6).toUpperCase()}`}
+									address={`@${proposal.id.slice(0, 6).toUpperCase()}`}
 									fullAddress={proposal.id}
 								/>
+								{currentAccount?.address === proposal.proposer && (
+									<span className='text-primary font-bold ml-1'>(You)</span>
+								)}
 							</span>
 							<span className='text-xs text-slate-500'>
-								{new Date(proposal.createdAt).toLocaleDateString()}
+								{formatTimeAgo(new Date(proposal.createdAt))}
 							</span>
 						</div>
 					</div>
@@ -319,6 +339,65 @@ function ProposalCard({
 			) : (
 				<div className='text-center pt-3 border-t border-slate-50 text-[10px] text-slate-400 uppercase font-bold tracking-widest'>
 					Voting Closed
+				</div>
+			)}
+
+			{/* Delete Action for Creator */}
+			{isCreator && proposal.status === 'Active' && (
+				<div className='pt-3 mt-3 border-t border-slate-50'>
+					{approvalPercentage < 50 && rejectionPercentage < 50 ? (
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<button
+									disabled={isDeleting}
+									className='w-full py-2 text-xs text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-2 group/delete'
+									title='Delete Proposal'>
+									{isDeleting ? (
+										<Loader className='animate-spin h-3 w-3' />
+									) : (
+										<>
+											<Trash2
+												size={14}
+												className='group-hover/delete:scale-110 transition-transform'
+											/>
+											<span>Delete Proposal</span>
+										</>
+									)}
+								</button>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Delete Proposal</AlertDialogTitle>
+									<AlertDialogDescription>
+										Are you sure you want to delete this proposal? This action
+										cannot be undone.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction
+										onClick={(e) => {
+											e.preventDefault();
+											deleteProposal();
+										}}
+										className='bg-red-600 hover:bg-red-700 text-white'>
+										{isDeleting ? (
+											<Loader className='h-4 w-4 animate-spin' />
+										) : (
+											'Delete'
+										)}
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+					) : (
+						<div
+							className='w-full py-2 text-xs text-slate-300 flex items-center justify-center gap-2 cursor-not-allowed'
+							title='Cannot delete proposal after 50% voting threshold reached'>
+							<Trash2 size={14} />
+							<span>Delete Unavailable (Votes {'>'} 50%)</span>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

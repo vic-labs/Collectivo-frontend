@@ -11,7 +11,9 @@ import * as campaignModule from '@/contract-sdk/collectivo/campaign';
 import { ViewTxLink } from '@/components/view-tx-link';
 import { useRouter } from '@tanstack/react-router';
 
-const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
+import { TOAST_DESCRIPTION_CLASSNAME } from '@/lib/constants';
+
+const descriptionClassName = TOAST_DESCRIPTION_CLASSNAME;
 
 export function useDeleteCampaign({ campaignId }: { campaignId: string }) {
 	const [isDeleting, setIsDeleting] = useState(false);

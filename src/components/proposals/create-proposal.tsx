@@ -14,7 +14,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useCreateProposal } from '@/lib/hooks/proposals/useCreateProposal';
 
-const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
+import { TOAST_DESCRIPTION_CLASSNAME } from '@/lib/constants';
+
+const descriptionClassName = TOAST_DESCRIPTION_CLASSNAME;
 
 type CreateProposalProps = {
 	campaignId: string;

@@ -24,7 +24,9 @@ import { cn } from '@/lib/utils';
 import { useCreateCampaign } from '@/lib/hooks/campaigns/useCreateCampaign';
 import { NFT_NOT_LISTED_ERROR } from '@/utils/nft';
 
-const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
+import { TOAST_DESCRIPTION_CLASSNAME } from '@/lib/constants';
+
+const descriptionClassName = TOAST_DESCRIPTION_CLASSNAME;
 
 type CustomField = {
 	description: string;

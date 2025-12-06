@@ -16,7 +16,9 @@ import { suiNftApiResponse } from '@/lib/app-utils';
 
 type NftData = suiNftApiResponse & { listingPrice: number };
 
-const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
+import { TOAST_DESCRIPTION_CLASSNAME } from '@/lib/constants';
+
+const descriptionClassName = TOAST_DESCRIPTION_CLASSNAME;
 
 export function useCreateCampaign() {
 	const [isCreating, setIsCreating] = useState(false);

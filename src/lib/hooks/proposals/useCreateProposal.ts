@@ -12,7 +12,9 @@ import { Proposal } from '@collectivo/shared-types';
 import { updateCampaignQueryData } from '@/utils/campaigns';
 import { suiToMistSafe } from '@/lib/app-utils';
 
-const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
+import { TOAST_DESCRIPTION_CLASSNAME } from '@/lib/constants';
+
+const descriptionClassName = TOAST_DESCRIPTION_CLASSNAME;
 
 export function useCreateProposal(campaignId: string) {
 	const [isCreating, setIsCreating] = useState(false);

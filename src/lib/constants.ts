@@ -33,3 +33,5 @@ export const SPECIAL_NFT_ROYALTIES = [
     royaltyPercentage: 4
   }
 ] as const;
+
+export const TOAST_DESCRIPTION_CLASSNAME = 'text-gray-800! dark:text-gray-200!';

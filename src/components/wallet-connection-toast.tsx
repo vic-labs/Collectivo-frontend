@@ -3,7 +3,9 @@ import { useCurrentAccount, useCurrentWallet } from '@mysten/dapp-kit';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-const descriptionClassName = 'text-gray-800! dark:text-gray-200!';
+import { TOAST_DESCRIPTION_CLASSNAME } from '@/lib/constants';
+
+const descriptionClassName = TOAST_DESCRIPTION_CLASSNAME;
 
 type walletConnectState = {
 	state: {
