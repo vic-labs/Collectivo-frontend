@@ -55,7 +55,10 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 							Funding Progress
 						</span>
 						<span className='text-lg font-bold'>
-							{progressPercentage.toFixed(1)}%
+							{Number.isInteger(progressPercentage)
+								? progressPercentage
+								: progressPercentage.toFixed(1)}
+							%
 						</span>
 					</div>
 					<Progress

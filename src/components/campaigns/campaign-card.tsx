@@ -68,7 +68,10 @@ export const CampaignCard = ({
 								Progress
 							</span>
 							<span className='font-bold'>
-								{progressPercentage.toFixed(1)}%
+								{Number.isInteger(progressPercentage)
+									? progressPercentage
+									: progressPercentage.toFixed(1)}
+								%
 							</span>
 						</div>
 						<Progress
