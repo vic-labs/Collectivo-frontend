@@ -8,7 +8,10 @@ import { RankBadge } from '../rank-badge';
 import { ViewAddressLink } from '../view-tx-link';
 
 export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
-	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
+	const progressPercentage = Math.min(
+		(campaign.suiRaised / campaign.target) * 100,
+		100
+	);
 	const account = useCurrentAccount();
 
 	return (

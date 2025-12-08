@@ -12,7 +12,10 @@ export const CampaignCard = ({
 }: {
 	campaign: CampaignWithContributors;
 }) => {
-	const progressPercentage = (campaign.suiRaised / campaign.target) * 100;
+	const progressPercentage = Math.min(
+		(campaign.suiRaised / campaign.target) * 100,
+		100
+	);
 	const isCompleted = campaign.status === 'Completed';
 
 	return (

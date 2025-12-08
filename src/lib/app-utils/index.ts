@@ -100,8 +100,14 @@ export function generateCampaignId(): string {
 export function formatNumberToHumanReadable(number?: number): string {
     if (!number) return '0';
 
-    // Add thousand separators for integers
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    // Round to 2 decimal places
+    const rounded = Math.round(number * 100) / 100;
+    const [integerPart, decimalPart] = rounded.toString().split('.');
+
+    // Add thousand separators only to integer part
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
 }
 
 export function calculateUserPower(
