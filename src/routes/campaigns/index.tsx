@@ -78,7 +78,11 @@ function RouteComponent() {
 					campaigns
 				</p>
 			</div>
-			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-5 items-stretch'>
+			{/* Using auto-rows-fr to make all grid rows have equal height dynamically.
+			    This works because it sets each row to take up a fraction (fr) of available space,
+			    forcing all cards in each row to stretch to the same height regardless of content length.
+			    items-stretch only works for flexbox, not CSS Grid. */}
+			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-5 auto-rows-fr'>
 				{filteredAndSorted.map((campaign) => (
 					<CampaignCard key={campaign.id} campaign={campaign} />
 				))}
