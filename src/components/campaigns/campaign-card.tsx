@@ -73,7 +73,7 @@ export const CampaignCard = ({
 						</div>
 						<Progress
 							value={progressPercentage}
-							className={`h-2 ${isCompleted ? '[&>div]:!bg-green-500' : ''}`}
+							className={`h-2 ${isCompleted ? '[&>div]:bg-green-500!' : ''}`}
 						/>
 						<div className='flex justify-between text-sm'>
 							<span className='text-muted-foreground font-medium'>Raised</span>
