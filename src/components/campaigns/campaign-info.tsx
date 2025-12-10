@@ -55,15 +55,12 @@ export const CampaignInfo = ({ campaign }: { campaign: Campaign }) => {
 							Funding Progress
 						</span>
 						<span className='text-lg font-bold'>
-							{Number.isInteger(progressPercentage)
-								? progressPercentage
-								: progressPercentage.toFixed(1)}
-							%
+							{Math.round(progressPercentage)}%
 						</span>
 					</div>
 					<Progress
 						value={progressPercentage}
-						className={`h-3 ${campaign.status === 'Completed' ? '[&>div]:!bg-green-500' : ''}`}
+						className={`h-3 ${campaign.status === 'Completed' ? '[&>div]:bg-green-500!' : ''}`}
 					/>
 				</div>
 

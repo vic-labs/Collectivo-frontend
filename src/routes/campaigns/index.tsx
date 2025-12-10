@@ -20,7 +20,7 @@ export const Route = createFileRoute('/campaigns/')({
 			isActive,
 			sortBy,
 			sortOrder,
-		} as CampaignAPIQueryFilters),
+		}) as CampaignAPIQueryFilters,
 	loader: async ({ context, deps }) => {
 		const campaigns = await context.queryClient.ensureQueryData(
 			campaignsQueryOptions({
@@ -28,7 +28,7 @@ export const Route = createFileRoute('/campaigns/')({
 				limit: deps.limit,
 				page: deps.page,
 			} as CampaignAPIQueryFilters)
-		)
+		);
 		return { campaigns, params: deps };
 	},
 	component: RouteComponent,
@@ -63,8 +63,8 @@ function RouteComponent() {
 
 			if (aValue < bValue) return order === 'asc' ? -1 : 1;
 			if (aValue > bValue) return order === 'asc' ? 1 : -1;
-			return 0
-		})
+			return 0;
+		});
 
 	return (
 		<>
@@ -78,11 +78,11 @@ function RouteComponent() {
 					campaigns
 				</p>
 			</div>
-			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-5'>
+			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-5 items-stretch'>
 				{filteredAndSorted.map((campaign) => (
 					<CampaignCard key={campaign.id} campaign={campaign} />
 				))}
 			</div>
 		</>
-	)
+	);
 }
