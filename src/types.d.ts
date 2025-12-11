@@ -13,6 +13,7 @@ declare global {
 		withdrawals: Withdrawal[];
 		contributions: Contribution[];
 		proposals: ProposalWithVotes[];
+		nftEvents?: NftEvent[];
 	};
 
 	type UserCampaign = CampaignWithContributors & {

@@ -1,4 +1,4 @@
-import { Campaign, Contribution, Withdrawal } from '@collectivo/shared-types';
+import { Contribution, Withdrawal, NftEvent } from '@collectivo/shared-types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,18 +11,15 @@ import { useState } from 'react';
 import { CampaignAdminActions } from './admin-actions';
 
 type CampaignActionsProps = {
-	campaign: Campaign;
-	contributions: Contribution[];
-	withdrawals: Withdrawal[];
+	campaignDetails: CampaignAndDetails;
 	userAddress?: string;
 };
 
 export const CampaignActions = ({
-	campaign,
-	contributions,
-	withdrawals,
+	campaignDetails,
 	userAddress,
 }: CampaignActionsProps) => {
+	const { campaign, contributions, withdrawals, nftEvents = [] } = campaignDetails;
 	const network = useNetwork();
 	const [activityFilter, setActivityFilter] = useState<'all' | 'mine'>('all');
 
@@ -38,16 +35,19 @@ export const CampaignActions = ({
 	const userBalance = userContributions - userWithdrawals;
 	const isActive = campaign.status === 'Active';
 
-	// Filter activities based on selected tab
-	const filteredContributions =
-		activityFilter === 'mine' && userAddress
-			? contributions.filter((c) => c.contributor === userAddress)
-			: contributions;
+  // Filter activities based on selected tab
+  const filteredContributions =
+    activityFilter === 'mine' && userAddress
+      ? contributions.filter((c) => c.contributor === userAddress)
+      : contributions;
 
-	const filteredWithdrawals =
-		activityFilter === 'mine' && userAddress
-			? withdrawals.filter((w) => w.contributor === userAddress)
-			: withdrawals;
+  const filteredWithdrawals =
+    activityFilter === 'mine' && userAddress
+      ? withdrawals.filter((w) => w.contributor === userAddress)
+      : withdrawals;
+
+  // NFT events are campaign-wide, so only show in "all" tab
+  const filteredNftEvents = activityFilter === 'all' ? nftEvents : [];
 
 	return (
 		<div className='space-y-6'>
@@ -119,19 +119,21 @@ export const CampaignActions = ({
 							</TabsTrigger>
 						</TabsList>
 						<TabsContent value={activityFilter} className='mt-0'>
-							{filteredContributions.length === 0 &&
-							filteredWithdrawals.length === 0 ? (
+                          {filteredContributions.length === 0 &&
+                          filteredWithdrawals.length === 0 &&
+                          filteredNftEvents.length === 0 ? (
 								<p className='text-sm text-muted-foreground text-center py-8'>
 									{activityFilter === 'mine'
 										? 'You have no activity yet.'
 										: 'No activity yet. Be the first to contribute!'}
 								</p>
 							) : (
-								<div className='space-y-3 max-h-[400px] overflow-y-auto'>
-									{combineAndSortActivities(
-										filteredContributions,
-										filteredWithdrawals
-									).map((activity, index) => (
+                              <div className='space-y-3 max-h-[400px] overflow-y-auto'>
+                                    {combineAndSortActivities(
+                                      filteredContributions,
+                                      filteredWithdrawals,
+                                      filteredNftEvents
+                                    ).map((activity, index) => (
 										<div key={index}>
 											<a
 												href={EXPLORER_TX_URL({
@@ -145,7 +147,9 @@ export const CampaignActions = ({
 														className={`w-2 h-2 rounded-full ${
 															activity.type === 'contribution'
 																? 'bg-green-500'
-																: 'bg-orange-500'
+																: activity.type === 'withdrawal'
+																? 'bg-orange-500'
+																: 'bg-blue-500'
 														}`}
 													/>
 													<div>
@@ -154,11 +158,15 @@ export const CampaignActions = ({
 																? activity.isFirstContribution
 																	? 'Created & Contributed'
 																	: 'Contributed'
-																: 'Withdrew'}{' '}
-															{formatSuiAmount(activity.amount)} SUI
+																: activity.type === 'withdrawal'
+																? 'Withdrew'
+																: activity.eventType === 'Error'
+																? `NFT Error: ${activity.errorType}`
+																: `NFT ${activity.eventType}`}{' '}
+															{activity.amount ? formatSuiAmount(activity.amount) + ' SUI' : ''}
 														</p>
 														<p className='text-xs text-muted-foreground font-mono'>
-															{formatAddress(activity.address, userAddress)}
+															{activity.address ? formatAddress(activity.address, userAddress) : ''}
 														</p>
 													</div>
 												</div>
@@ -170,7 +178,8 @@ export const CampaignActions = ({
 												Math.min(
 													9,
 													filteredContributions.length +
-														filteredWithdrawals.length -
+														filteredWithdrawals.length +
+														filteredNftEvents.length -
 														1
 												) && <Separator />}
 										</div>
@@ -187,15 +196,18 @@ export const CampaignActions = ({
 
 function combineAndSortActivities(
 	contributions: Contribution[],
-	withdrawals: Withdrawal[]
+	withdrawals: Withdrawal[],
+	nftEvents: NftEvent[]
 ) {
 	type Activity = {
-		type: 'contribution' | 'withdrawal';
-		amount: number;
-		address: string;
+		type: 'contribution' | 'withdrawal' | 'nft_event';
+		amount?: number;
+		address?: string;
 		date: Date;
 		txHash: string | null;
-		isFirstContribution: boolean;
+		isFirstContribution?: boolean;
+		eventType?: 'Purchased' | 'Listed' | 'Delisted' | 'Error';
+		errorType?: 'Listing' | 'Purchasing' | 'Delisting' | null;
 	};
 
 	const activities: Activity[] = [
@@ -214,6 +226,13 @@ function combineAndSortActivities(
 			date: new Date(w.withdrawnAt),
 			txHash: w.txDigest,
 			isFirstContribution: false,
+		})),
+		...nftEvents.map((e) => ({
+			type: 'nft_event' as const,
+			date: new Date(e.occurredAt),
+			txHash: e.txDigest,
+			eventType: e.eventType,
+			errorType: e.errorType,
 		})),
 	];
 

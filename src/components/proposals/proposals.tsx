@@ -343,61 +343,52 @@ function ProposalCard({
 			)}
 
 			{/* Delete Action for Creator */}
-			{isCreator && proposal.status === 'Active' && (
+			{isCreator && proposal.status === 'Active' && approvalPercentage < 50 && rejectionPercentage < 50 && (
 				<div className='pt-3 mt-3 border-t border-slate-50'>
-					{approvalPercentage < 50 && rejectionPercentage < 50 ? (
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<button
-									disabled={isDeleting}
-									className='w-full py-2 text-xs text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-2 group/delete'
-									title='Delete Proposal'>
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<button
+								disabled={isDeleting}
+								className='w-full py-2 text-xs text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-2 group/delete'
+								title='Delete Proposal'>
+								{isDeleting ? (
+									<Loader className='animate-spin h-3 w-3' />
+								) : (
+									<>
+										<Trash2
+											size={14}
+											className='group-hover/delete:scale-110 transition-transform'
+										/>
+										<span>Delete Proposal</span>
+									</>
+								)}
+							</button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Delete Proposal</AlertDialogTitle>
+								<AlertDialogDescription>
+									Are you sure you want to delete this proposal? This action
+									cannot be undone.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={(e) => {
+										e.preventDefault();
+										deleteProposal();
+									}}
+									className='bg-red-600 hover:bg-red-700 text-white'>
 									{isDeleting ? (
-										<Loader className='animate-spin h-3 w-3' />
+										<Loader className='h-4 w-4 animate-spin' />
 									) : (
-										<>
-											<Trash2
-												size={14}
-												className='group-hover/delete:scale-110 transition-transform'
-											/>
-											<span>Delete Proposal</span>
-										</>
+										'Delete'
 									)}
-								</button>
-							</AlertDialogTrigger>
-							<AlertDialogContent>
-								<AlertDialogHeader>
-									<AlertDialogTitle>Delete Proposal</AlertDialogTitle>
-									<AlertDialogDescription>
-										Are you sure you want to delete this proposal? This action
-										cannot be undone.
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel>Cancel</AlertDialogCancel>
-									<AlertDialogAction
-										onClick={(e) => {
-											e.preventDefault();
-											deleteProposal();
-										}}
-										className='bg-red-600 hover:bg-red-700 text-white'>
-										{isDeleting ? (
-											<Loader className='h-4 w-4 animate-spin' />
-										) : (
-											'Delete'
-										)}
-									</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
-						</AlertDialog>
-					) : (
-						<div
-							className='w-full py-2 text-xs text-slate-300 flex items-center justify-center gap-2 cursor-not-allowed'
-							title='Cannot delete proposal after 50% voting threshold reached'>
-							<Trash2 size={14} />
-							<span>Delete Unavailable (Votes {'>'} 50%)</span>
-						</div>
-					)}
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
 				</div>
 			)}
 		</div>

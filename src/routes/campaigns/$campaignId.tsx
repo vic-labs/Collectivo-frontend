@@ -19,9 +19,8 @@ export const Route = createFileRoute('/campaigns/$campaignId')({
 
 function RouteComponent() {
 	const { campaignId } = Route.useParams();
-	const {
-		data: { campaign, withdrawals, contributions, proposals },
-	} = useSuspenseQuery(campaignQueryOptions(campaignId));
+	const { data: campaignDetails } = useSuspenseQuery(campaignQueryOptions(campaignId));
+	const { campaign, contributions, withdrawals, proposals } = campaignDetails;
 	const account = useCurrentAccount();
 
 	// Show proposals for completed campaigns
@@ -49,9 +48,7 @@ function RouteComponent() {
 					)}
 
 					<CampaignActions
-						campaign={campaign}
-						contributions={contributions}
-						withdrawals={withdrawals}
+						campaignDetails={campaignDetails}
 						userAddress={account?.address}
 					/>
 				</div>

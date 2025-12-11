@@ -24,7 +24,7 @@ export const CampaignCard = ({
 			params={{
 				campaignId: campaign.id,
 			}}>
-			<Card className='overflow-hidden hover:shadow-lg transition-shadow p-0! w-full cursor-pointer'>
+			<Card className='overflow-hidden hover:shadow-lg transition-shadow p-0! w-full cursor-pointer h-full'>
 				<CardHeader className='p-0! -mb-6!'>
 					<div className='relative'>
 						<img
