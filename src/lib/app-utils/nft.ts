@@ -5,13 +5,16 @@ import { deriveDynamicFieldID } from "@mysten/sui/utils";
 
 
 
+function findRoyaltyPolicy(policies: any[]): any | null {
+    return policies.find(policy =>
+        policy.rules.some((rule: string) => rule.includes('royalty_rule::Rule'))
+    ) || null;
+}
+
 export async function getTransferPolicyId({ nftType }: { nftType: string }): Promise<string | null> {
     try {
         const policies = await kioskClient.getTransferPolicies({ type: nftType });
-        // Find policy with royalty rules
-        const policyWithRoyalty = policies.find(policy =>
-            policy.rules.some(rule => rule.includes('royalty_rule::Rule'))
-        );
+        const policyWithRoyalty = findRoyaltyPolicy(policies);
 
         if (policyWithRoyalty) {
             console.log("✅ Transfer policy with royalty found and returned");
@@ -65,14 +68,14 @@ export async function getNativeKioskListingPrice({
             return undefined;
         }
 
-        const policy = policies.find(p => p.rules.some(rule => rule.includes('royalty_rule::Rule')));
+        const policy = findRoyaltyPolicy(policies);
         if (!policy) {
             console.error("❌ No policy with royalty rules found");
             return undefined;
         }
 
         // Step 4: Extract royalty package from actual policy
-        const royaltyRule = policy.rules.find(rule => rule.includes('royalty_rule::Rule'));
+        const royaltyRule = policy.rules.find((rule: string) => rule.includes('royalty_rule::Rule'));
         if (!royaltyRule) {
             console.error("❌ Royalty rule not found in policy");
             return undefined;
