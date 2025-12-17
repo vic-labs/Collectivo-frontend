@@ -17,6 +17,7 @@
     "@fontsource/montserrat": "^5.2.8",
     "@mysten/codegen": "^0.5.13",
     "@mysten/dapp-kit": "^0.19.11",
+    "@mysten/kiosk": "^0.14.6",
     "@mysten/sui": "^1.45.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",

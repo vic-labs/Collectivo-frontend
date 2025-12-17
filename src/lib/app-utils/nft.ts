@@ -1,5 +1,5 @@
 import { MIST_PER_SUI } from "@mysten/sui/utils";
-import { ROYALTY_RULE_PACKAGE_ID, TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient, SPECIAL_NFT_ROYALTIES } from "../constants";
+import { TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient, SPECIAL_NFT_ROYALTIES, kioskClient } from "../constants";
 import { bcs } from "@mysten/sui/bcs";
 import { deriveDynamicFieldID } from "@mysten/sui/utils";
 
@@ -7,21 +7,18 @@ import { deriveDynamicFieldID } from "@mysten/sui/utils";
 
 export async function getTransferPolicyId({ nftType }: { nftType: string }): Promise<string | null> {
     try {
-        const eventType = `0x2::transfer_policy::TransferPolicyCreated<${nftType}>`;
-        const response = await suiMainnetClient.queryEvents({
-            query: { MoveEventType: eventType },
-            limit: 1,
-        });
+        const policies = await kioskClient.getTransferPolicies({ type: nftType });
+        // Find policy with royalty rules
+        const policyWithRoyalty = policies.find(policy =>
+            policy.rules.some(rule => rule.includes('royalty_rule::Rule'))
+        );
 
-        if (response.data.length > 0) {
-            const policyId = (response.data[0].parsedJson as any)?.id;
-            console.log("✅ Transfer policy id found and returned");
-            return policyId || null;
+        if (policyWithRoyalty) {
+            console.log("✅ Transfer policy with royalty found and returned");
+            return policyWithRoyalty.id;
         }
 
-        console.log("❌ Transfer policy id not found");
-
-
+        console.log("❌ Transfer policy with royalty not found");
         return null;
     } catch (e) {
         return null;
@@ -37,19 +34,15 @@ export async function getNativeKioskListingPrice({
     nftType: string
 }) {
     try {
-        // Step 1: Get transfer policy + kiosk
-        const [transferPolicyId, kioskId] = await Promise.all([
-            getTransferPolicyId({ nftType }),
-            getKioskId(nftId)
-        ]);
-
-        if (!transferPolicyId || !kioskId) {
-            console.error("❌ Missing transfer policy or kiosk", { transferPolicyId, kioskId });
+        // Step 1: Get kiosk (no longer need transferPolicyId here)
+        const kioskId = await getKioskId(nftId);
+        if (!kioskId) {
+            console.error("❌ Missing kiosk", { kioskId });
             return undefined;
         }
 
         // Step 2: Fetch listing price (mist)
-        const listingPromise = suiMainnetClient.getDynamicFieldObject({
+        const listingResponse = await suiMainnetClient.getDynamicFieldObject({
             parentId: kioskId,
             name: {
                 type: '0x2::kiosk::Listing',
@@ -57,28 +50,50 @@ export async function getNativeKioskListingPrice({
             }
         });
 
-        // Step 3: Prepare royalty dynamic field ID
-        const ruleKeyType = `0x2::transfer_policy::RuleKey<${ROYALTY_RULE_PACKAGE_ID}::royalty_rule::Rule>`;
+        if (!listingResponse.data?.content) {
+            console.error("❌ Listing not found");
+            return undefined;
+        }
+
+        const listingMist = parseInt((listingResponse.data.content as any).fields.value);
+        if (!listingMist) return undefined;
+
+        // Step 3: Get transfer policy and royalty info dynamically
+        const policies = await kioskClient.getTransferPolicies({ type: nftType });
+        if (policies.length === 0) {
+            console.error("❌ No transfer policies found");
+            return undefined;
+        }
+
+        const policy = policies.find(p => p.rules.some(rule => rule.includes('royalty_rule::Rule')));
+        if (!policy) {
+            console.error("❌ No policy with royalty rules found");
+            return undefined;
+        }
+
+        // Step 4: Extract royalty package from actual policy
+        const royaltyRule = policy.rules.find(rule => rule.includes('royalty_rule::Rule'));
+        if (!royaltyRule) {
+            console.error("❌ Royalty rule not found in policy");
+            return undefined;
+        }
+        const royaltyPackageId = royaltyRule.split('::')[0];
+
+        // Step 5: Prepare royalty dynamic field ID with correct package and policy
+        const ruleKeyType = `0x2::transfer_policy::RuleKey<${royaltyPackageId}::royalty_rule::Rule>`;
         const royaltyKey = bcs.struct(ruleKeyType, { dummy_field: bcs.bool() })
             .serialize({ dummy_field: false })
             .toBytes();
 
-        const royaltyDfId = deriveDynamicFieldID(transferPolicyId, ruleKeyType, royaltyKey);
+        const royaltyDfId = deriveDynamicFieldID(policy.id, ruleKeyType, royaltyKey);
 
-        // Step 4: Fetch royalty config
-        const royaltyPromise = suiMainnetClient.getObject({
+        // Step 6: Fetch royalty config
+        const royaltyConfig = await suiMainnetClient.getObject({
             id: royaltyDfId,
             options: { showContent: true }
         });
 
-        // Step 5: Await both
-        const [listingResponse, royaltyConfig] = await Promise.all([listingPromise, royaltyPromise]);
-
-        // Step 6: Extract listing price in mist
-        const listingMist = parseInt((listingResponse.data!.content as any).fields.value);
-        if (!listingMist) return undefined;
-
-        // Step 7: Calculate royalty in mist
+        // Step 7: Calculate royalty (rest stays the same)
         let royaltyMist = 0;
 
         if (royaltyConfig.data) {
@@ -104,12 +119,14 @@ export async function getNativeKioskListingPrice({
         // Final total mist
         const totalMist = listingMist + royaltyMist + platformFeeMist;
 
-        console.log("Listing price details:")
+        console.log("Listing price details:");
         console.log({
             listingMist,
             royaltyMist,
             platformFeeMist,
             totalMist,
+            policyId: policy.id,
+            royaltyPackageId,
             basisPoints: royaltyConfig.data ? (royaltyConfig.data.content as any).fields.value.fields.amount_bp : null,
             debug: {
                 listingSui: Number(listingMist) / Number(MIST_PER_SUI),

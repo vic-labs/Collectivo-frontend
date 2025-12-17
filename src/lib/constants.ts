@@ -1,5 +1,6 @@
 import { getFullnodeUrl } from '@mysten/sui/client';
 import { SuiClient } from '@mysten/sui/client';
+import { KioskClient, Network } from '@mysten/kiosk';
 
 // Re-export all constants from shared-types
 export {
@@ -18,6 +19,11 @@ export const ROYALTY_RULE_PACKAGE_ID = "0x434b5bd8f6a7b05fede0ff46c6e511d71ea326
 
 export const suiMainnetClient = new SuiClient({
   url: getFullnodeUrl('mainnet'),
+});
+
+export const kioskClient = new KioskClient({
+  client: suiMainnetClient,
+  network: Network.MAINNET,
 });
 
 export const API_ENDPOINT = import.meta.env.DEV ? 'http://localhost:4444' : 'https://collectivo-api-proxy.nnadivictory316.workers.dev';
