@@ -1,29 +1,8 @@
 import { MIST_PER_SUI } from "@mysten/sui/utils";
-import { TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient, SPECIAL_NFT_ROYALTIES, kioskClient } from "../constants";
+import { TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient, SPECIAL_NFT_ROYALTIES } from "../constants";
 import { bcs } from "@mysten/sui/bcs";
 import { deriveDynamicFieldID } from "@mysten/sui/utils";
-import { TransferPolicy } from "@mysten/kiosk";
-
-async function findTransferPolicyWithRoyaltyRule({ nftType }: { nftType: string }): Promise<TransferPolicy | null> {
-    const policies = await kioskClient.getTransferPolicies({ type: nftType });
-    return policies.find(policy => policy.rules.some(rule => rule.includes('royalty_rule::Rule'))) || null;
-}
-
-export async function getTransferPolicyId({ nftType }: { nftType: string }): Promise<string | null> {
-    try {
-        const transferPolicyWithRoyalty = await findTransferPolicyWithRoyaltyRule({ nftType });
-
-        if (transferPolicyWithRoyalty) {
-            console.log("✅ Transfer policy with royalty found and returned");
-            return transferPolicyWithRoyalty.id;
-        }
-
-        console.log("❌ Transfer policy with royalty not found");
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
+import { getTransferPolicyWithRoyalty } from "@collectivo/shared-types";
 
 
 export async function getNativeKioskListingPrice({
@@ -59,14 +38,14 @@ export async function getNativeKioskListingPrice({
         if (!listingMist) return undefined;
 
         // Step 3: Get transfer policy and royalty info dynamically
-        const transferPolicyWithRoyalty = await findTransferPolicyWithRoyaltyRule({ nftType });
+        const transferPolicyWithRoyalty = await getTransferPolicyWithRoyalty({ nftType });
         if (!transferPolicyWithRoyalty) {
             console.error("❌ No transfer policy with royalty rule found");
             return undefined;
         }
 
         // Step 4: Extract royalty package from actual policy
-        const royaltyRule = transferPolicyWithRoyalty.rules.find(rule => rule.includes('royalty_rule::Rule'));
+        const royaltyRule = transferPolicyWithRoyalty.rules.find((rule: string) => rule.includes('royalty_rule::Rule'));
         if (!royaltyRule) {
             console.error("❌ Royalty rule not found in policy");
             return undefined;
