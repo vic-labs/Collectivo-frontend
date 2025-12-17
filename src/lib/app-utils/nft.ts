@@ -2,23 +2,20 @@ import { MIST_PER_SUI } from "@mysten/sui/utils";
 import { TRADEPORT_STORE_PACKAGE_ID, suiMainnetClient, SPECIAL_NFT_ROYALTIES, kioskClient } from "../constants";
 import { bcs } from "@mysten/sui/bcs";
 import { deriveDynamicFieldID } from "@mysten/sui/utils";
+import { TransferPolicy } from "@mysten/kiosk";
 
-
-
-function findRoyaltyPolicy(policies: any[]): any | null {
-    return policies.find(policy =>
-        policy.rules.some((rule: string) => rule.includes('royalty_rule::Rule'))
-    ) || null;
+async function findTransferPolicyWithRoyaltyRule({ nftType }: { nftType: string }): Promise<TransferPolicy | null> {
+    const policies = await kioskClient.getTransferPolicies({ type: nftType });
+    return policies.find(policy => policy.rules.some(rule => rule.includes('royalty_rule::Rule'))) || null;
 }
 
 export async function getTransferPolicyId({ nftType }: { nftType: string }): Promise<string | null> {
     try {
-        const policies = await kioskClient.getTransferPolicies({ type: nftType });
-        const policyWithRoyalty = findRoyaltyPolicy(policies);
+        const transferPolicyWithRoyalty = await findTransferPolicyWithRoyaltyRule({ nftType });
 
-        if (policyWithRoyalty) {
+        if (transferPolicyWithRoyalty) {
             console.log("✅ Transfer policy with royalty found and returned");
-            return policyWithRoyalty.id;
+            return transferPolicyWithRoyalty.id;
         }
 
         console.log("❌ Transfer policy with royalty not found");
@@ -62,20 +59,14 @@ export async function getNativeKioskListingPrice({
         if (!listingMist) return undefined;
 
         // Step 3: Get transfer policy and royalty info dynamically
-        const policies = await kioskClient.getTransferPolicies({ type: nftType });
-        if (policies.length === 0) {
-            console.error("❌ No transfer policies found");
-            return undefined;
-        }
-
-        const policy = findRoyaltyPolicy(policies);
-        if (!policy) {
-            console.error("❌ No policy with royalty rules found");
+        const transferPolicyWithRoyalty = await findTransferPolicyWithRoyaltyRule({ nftType });
+        if (!transferPolicyWithRoyalty) {
+            console.error("❌ No transfer policy with royalty rule found");
             return undefined;
         }
 
         // Step 4: Extract royalty package from actual policy
-        const royaltyRule = policy.rules.find((rule: string) => rule.includes('royalty_rule::Rule'));
+        const royaltyRule = transferPolicyWithRoyalty.rules.find(rule => rule.includes('royalty_rule::Rule'));
         if (!royaltyRule) {
             console.error("❌ Royalty rule not found in policy");
             return undefined;
@@ -88,7 +79,7 @@ export async function getNativeKioskListingPrice({
             .serialize({ dummy_field: false })
             .toBytes();
 
-        const royaltyDfId = deriveDynamicFieldID(policy.id, ruleKeyType, royaltyKey);
+        const royaltyDfId = deriveDynamicFieldID(transferPolicyWithRoyalty.id, ruleKeyType, royaltyKey);
 
         // Step 6: Fetch royalty config
         const royaltyConfig = await suiMainnetClient.getObject({
@@ -128,7 +119,7 @@ export async function getNativeKioskListingPrice({
             royaltyMist,
             platformFeeMist,
             totalMist,
-            policyId: policy.id,
+            transferPolicyId: transferPolicyWithRoyalty.id,
             royaltyPackageId,
             basisPoints: royaltyConfig.data ? (royaltyConfig.data.content as any).fields.value.fields.amount_bp : null,
             debug: {
